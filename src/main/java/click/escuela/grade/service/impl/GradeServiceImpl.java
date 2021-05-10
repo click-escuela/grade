@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import click.escuela.grade.api.GradeApi;
 import click.escuela.grade.dto.GradeDTO;
@@ -14,6 +15,7 @@ import click.escuela.grade.model.Grade;
 import click.escuela.grade.repository.GradeRepository;
 import click.escuela.grade.service.GradeServiceGeneric;
 
+@Service
 public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO> {
 
 	@Autowired
@@ -23,7 +25,7 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 	public void create(String studentId, GradeApi gradeApi) throws TransactionException {
 		try {
 			Grade grade = Mapper.mapperToGrade(gradeApi);
-			grade.setId(UUID.fromString(studentId));
+			grade.setStudentId(UUID.fromString(studentId));
 			gradeRepository.save(grade);
 		} catch (Exception e) {
 			throw new TransactionException(GradeEnum.CREATE_ERROR.getCode(), GradeEnum.CREATE_ERROR.getDescription());
