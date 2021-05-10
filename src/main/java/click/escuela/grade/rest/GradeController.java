@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @RestController
-@RequestMapping(path = "")
+@RequestMapping(path = "/school/{schoolId}/grade")
 public class GradeController {
 
 	@Autowired
