@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
 
 import click.escuela.grade.api.GradeApi;
 import click.escuela.grade.dto.GradeDTO;
 import click.escuela.grade.model.Grade;
 
+@Component
 public class Mapper {
 
 	private static ModelMapper modelMapper = new ModelMapper();
