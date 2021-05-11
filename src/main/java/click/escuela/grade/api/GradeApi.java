@@ -24,22 +24,22 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class GradeApi {
 
-	@NotBlank(message = "Name cannot be null")
+	@NotBlank(message = "Name cannot be empty")
 	@Size(max = 50, message = "Name must be less than 50 characters")
 	@JsonProperty(value = "name", required = true)
 	private String name;
 
-	@NotBlank(message = "Course cannot  be null")
+	@NotBlank(message = "Course cannot be empty")
 	@Size(max = 50, message = "Course must be less than 50 characters")
 	@JsonProperty(value = "course", required = true)
 	private String course;
 
-	@NotBlank(message = "Subject cannot  be null")
+	@NotBlank(message = "Subject cannot be empty")
 	@Size(max = 50, message = "Subject must be less than 50 characters")
 	@JsonProperty(value = "subject", required = true)
 	private String subject;
 
-	@NotBlank(message = "Type cannot  be null")
+	@NotBlank(message = "Type cannot be empty")
 	@Size(max = 50, message = "Type must be less than 50 characters")
 	@JsonProperty(value = "type", required = true)
 	private String type;
