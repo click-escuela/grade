@@ -16,6 +16,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import click.escuela.grade.api.GradeApi;
+import click.escuela.grade.enumerator.TypeEnum;
 import click.escuela.grade.exception.TransactionException;
 import click.escuela.grade.mapper.Mapper;
 import click.escuela.grade.model.Grade;
@@ -43,10 +44,10 @@ public class GradeServiceTest {
 		studentId = UUID.randomUUID();
 		courseId = UUID.randomUUID();
 
-		Grade grade = Grade.builder().id(id).name("Examen").subject("Matematica").type("Domiciliario")
+		Grade grade = Grade.builder().id(id).name("Examen").subject("Matematica").type(TypeEnum.HOMEWORK)
 				.courseId(courseId).number(10).studentId(studentId).build();
 
-		gradeApi = GradeApi.builder().name("Examen").subject("Matematica").type("Domiciliario").number(10).build();
+		gradeApi = GradeApi.builder().name("Examen").subject("Matematica").type(TypeEnum.HOMEWORK.toString()).number(10).build();
 
 		Mockito.when(Mapper.mapperToGrade(gradeApi)).thenReturn(grade);
 		Mockito.when(gradeRepository.save(grade)).thenReturn(grade);
@@ -68,7 +69,7 @@ public class GradeServiceTest {
 	@Test
 	public void whenCreateIsError() {
 
-		GradeApi gradeApi = GradeApi.builder().name("Parcial").subject("Literatura").type("Domiciliario").number(5)
+		GradeApi gradeApi = GradeApi.builder().name("Parcial").subject("Literatura").type(TypeEnum.EXAM.toString()).number(5)
 				.build();
 
 		Mockito.when(gradeRepository.save(null)).thenThrow(IllegalArgumentException.class);

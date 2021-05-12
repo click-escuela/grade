@@ -4,12 +4,15 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import click.escuela.grade.enumerator.TypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,7 +43,8 @@ public class Grade {
 	private String subject;
 	
 	@Column(name = "type", nullable = false)
-	private String type;
+	@Enumerated(EnumType.STRING)
+	private TypeEnum type;
 	
 	@Column(name = "number", nullable = false)
 	private Integer number;

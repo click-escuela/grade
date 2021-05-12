@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import click.escuela.grade.api.GradeApi;
 import click.escuela.grade.enumerator.GradeEnum;
+import click.escuela.grade.enumerator.TypeEnum;
 import click.escuela.grade.exception.TransactionException;
 import click.escuela.grade.rest.GradeController;
 import click.escuela.grade.rest.handler.Handler;
@@ -63,7 +64,7 @@ public class GradeControllerTest {
 		schoolId = "1234";
 		studentId = UUID.randomUUID().toString();
 		courseId = UUID.randomUUID().toString();
-		gradeApi = GradeApi.builder().name("Examen").subject("Matematica").studentId(studentId).type("Domiciliario").courseId(courseId)
+		gradeApi = GradeApi.builder().name("Examen").subject("Matematica").studentId(studentId).type(TypeEnum.HOMEWORK.toString()).courseId(courseId)
 				.number(10).build();
 
 		doNothing().when(gradeService).create(Mockito.any());

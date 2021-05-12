@@ -9,13 +9,13 @@ import org.springframework.stereotype.Component;
 
 import click.escuela.grade.api.GradeApi;
 import click.escuela.grade.dto.GradeDTO;
+import click.escuela.grade.enumerator.TypeEnum;
 import click.escuela.grade.model.Grade;
 
 @Component
 public class Mapper {
 	
 	private Mapper() {
-	    throw new IllegalStateException("");
 	}
 	
 	private static ModelMapper modelMapper = new ModelMapper();
@@ -24,10 +24,14 @@ public class Mapper {
 		Grade grade=modelMapper.map(gradeApi, Grade.class);
 		grade.setCourseId(UUID.fromString(gradeApi.getCourseId()));
 		grade.setStudentId(UUID.fromString(gradeApi.getStudentId()));
-		
+		grade.setType(mapperToEnum(gradeApi.getType()));
 		return grade;
 	}
-
+	
+	public static TypeEnum mapperToEnum(String type) {
+		return modelMapper.map(TypeEnum.valueOf(type), TypeEnum.class);
+	}
+	
 	public static GradeDTO mapperToGradeDTO(Grade grade) {
 		return modelMapper.map(grade, GradeDTO.class);
 	}
