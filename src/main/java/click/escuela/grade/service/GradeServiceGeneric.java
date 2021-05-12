@@ -6,7 +6,7 @@ import click.escuela.grade.exception.TransactionException;
 
 public interface GradeServiceGeneric<T, S> {
 
-	public void create(String id, T entity) throws TransactionException;
+	public void create(T entity) throws TransactionException;
 
 	public List<S> findAll();
 }

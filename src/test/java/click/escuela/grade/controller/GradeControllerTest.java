@@ -50,6 +50,7 @@ public class GradeControllerTest {
 	private static String EMPTY = "";
 	private String schoolId;
 	private String studentId;
+	private String courseId;
 
 	@Before
 	public void setup() throws TransactionException {
@@ -61,17 +62,18 @@ public class GradeControllerTest {
 
 		schoolId = "1234";
 		studentId = UUID.randomUUID().toString();
-		gradeApi = GradeApi.builder().name("Examen").subject("Matematica").type("Domiciliario").course("Segundo año")
+		courseId = UUID.randomUUID().toString();
+		gradeApi = GradeApi.builder().name("Examen").subject("Matematica").studentId(studentId).type("Domiciliario").courseId(courseId)
 				.number(10).build();
 
-		doNothing().when(gradeService).create(Mockito.anyString(), Mockito.any());
+		doNothing().when(gradeService).create(Mockito.any());
 	}
 
 	@Test
 	public void whenCreateIsOk() throws JsonProcessingException, Exception {
 
 		MvcResult result = mockMvc
-				.perform(post("/school/{schoolId}/grade/{studentId}", schoolId, studentId)
+				.perform(post("/school/{schoolId}/grade", schoolId)
 						.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi)))
 				.andExpect(status().is2xxSuccessful()).andReturn();
 		String response = result.getResponse().getContentAsString();
@@ -84,7 +86,7 @@ public class GradeControllerTest {
 
 		gradeApi.setName(EMPTY);
 		MvcResult result = mockMvc
-				.perform(post("/school/{schoolId}/grade/{studentId}", schoolId, studentId)
+				.perform(post("/school/{schoolId}/grade", schoolId)
 						.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi)))
 				.andExpect(status().isBadRequest()).andReturn();
 		String response = result.getResponse().getContentAsString();
@@ -97,7 +99,7 @@ public class GradeControllerTest {
 
 		gradeApi.setSubject(EMPTY);
 		MvcResult result = mockMvc
-				.perform(post("/school/{schoolId}/grade/{studentId}", schoolId, studentId)
+				.perform(post("/school/{schoolId}/grade", schoolId)
 						.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi)))
 				.andExpect(status().isBadRequest()).andReturn();
 		String response = result.getResponse().getContentAsString();
@@ -108,14 +110,28 @@ public class GradeControllerTest {
 	@Test
 	public void whenCreateButCourseEmpty() throws JsonProcessingException, Exception {
 
-		gradeApi.setCourse(EMPTY);
+		gradeApi.setCourseId(EMPTY);
 		;
 		MvcResult result = mockMvc
-				.perform(post("/school/{schoolId}/grade/{studentId}", schoolId, studentId)
+				.perform(post("/school/{schoolId}/grade", schoolId)
 						.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi)))
 				.andExpect(status().isBadRequest()).andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains("Course cannot be empty");
+
+	}
+	
+	@Test
+	public void whenCreateButStudentEmpty() throws JsonProcessingException, Exception {
+
+		gradeApi.setStudentId(EMPTY);
+		;
+		MvcResult result = mockMvc
+				.perform(post("/school/{schoolId}/grade", schoolId)
+						.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi)))
+				.andExpect(status().isBadRequest()).andReturn();
+		String response = result.getResponse().getContentAsString();
+		assertThat(response).contains("Student cannot be empty");
 
 	}
 
@@ -124,7 +140,7 @@ public class GradeControllerTest {
 
 		gradeApi.setType(EMPTY);
 		MvcResult result = mockMvc
-				.perform(post("/school/{schoolId}/grade/{studentId}", schoolId, studentId)
+				.perform(post("/school/{schoolId}/grade", schoolId)
 						.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi)))
 				.andExpect(status().isBadRequest()).andReturn();
 		String response = result.getResponse().getContentAsString();
@@ -137,7 +153,7 @@ public class GradeControllerTest {
 
 		gradeApi.setNumber(null);
 		MvcResult result = mockMvc
-				.perform(post("/school/{schoolId}/grade/{studentId}", schoolId, studentId)
+				.perform(post("/school/{schoolId}/grade", schoolId)
 						.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi)))
 				.andExpect(status().isBadRequest()).andReturn();
 		String response = result.getResponse().getContentAsString();

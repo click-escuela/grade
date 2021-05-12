@@ -2,6 +2,7 @@ package click.escuela.grade.mapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,11 @@ public class Mapper {
 	private static ModelMapper modelMapper = new ModelMapper();
 
 	public static Grade mapperToGrade(GradeApi gradeApi) {
-		return modelMapper.map(gradeApi, Grade.class);
+		Grade grade=modelMapper.map(gradeApi, Grade.class);
+		grade.setCourseId(UUID.fromString(gradeApi.getCourseId()));
+		grade.setStudentId(UUID.fromString(gradeApi.getStudentId()));
+		
+		return grade;
 	}
 
 	public static GradeDTO mapperToGradeDTO(Grade grade) {

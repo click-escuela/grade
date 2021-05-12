@@ -1,7 +1,6 @@
 package click.escuela.grade.service.impl;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,10 +21,9 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 	private GradeRepository gradeRepository;
 
 	@Override
-	public void create(String studentId, GradeApi gradeApi) throws TransactionException {
+	public void create(GradeApi gradeApi) throws TransactionException {
 		try {
 			Grade grade = Mapper.mapperToGrade(gradeApi);
-			grade.setStudentId(UUID.fromString(studentId));
 			gradeRepository.save(grade);
 		} catch (Exception e) {
 			throw new TransactionException(GradeEnum.CREATE_ERROR.getCode(), GradeEnum.CREATE_ERROR.getDescription());

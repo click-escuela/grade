@@ -33,6 +33,7 @@ public class GradeServiceTest {
 	private GradeApi gradeApi;
 	private UUID id;
 	private UUID studentId;
+	private UUID courseId;
 
 	@Before
 	public void setUp() {
@@ -40,12 +41,12 @@ public class GradeServiceTest {
 
 		id = UUID.randomUUID();
 		studentId = UUID.randomUUID();
+		courseId = UUID.randomUUID();
 
 		Grade grade = Grade.builder().id(id).name("Examen").subject("Matematica").type("Domiciliario")
-				.course("Segundo año").number(10).studentId(studentId).build();
+				.courseId(courseId).number(10).studentId(studentId).build();
 
-		gradeApi = GradeApi.builder().name("Examen").subject("Matematica").type("Domiciliario").course("Segundo año")
-				.number(10).build();
+		gradeApi = GradeApi.builder().name("Examen").subject("Matematica").type("Domiciliario").number(10).build();
 
 		Mockito.when(Mapper.mapperToGrade(gradeApi)).thenReturn(grade);
 		Mockito.when(gradeRepository.save(grade)).thenReturn(grade);
@@ -57,7 +58,7 @@ public class GradeServiceTest {
 	public void whenCreateIsOk() {
 		boolean hasError = false;
 		try {
-			gradeServiceImpl.create(studentId.toString(), gradeApi);
+			gradeServiceImpl.create(gradeApi);
 		} catch (Exception e) {
 			hasError = true;
 		}
@@ -67,14 +68,14 @@ public class GradeServiceTest {
 	@Test
 	public void whenCreateIsError() {
 
-		GradeApi gradeApi = GradeApi.builder().name("Parcial").subject("Literatura").type("Domiciliario")
-				.course("Segundo año").number(5).build();
+		GradeApi gradeApi = GradeApi.builder().name("Parcial").subject("Literatura").type("Domiciliario").number(5)
+				.build();
 
 		Mockito.when(gradeRepository.save(null)).thenThrow(IllegalArgumentException.class);
 
 		assertThatExceptionOfType(TransactionException.class).isThrownBy(() -> {
 
-			gradeServiceImpl.create(UUID.randomUUID().toString(), gradeApi);
+			gradeServiceImpl.create(gradeApi);
 		}).withMessage("No se pudo crear la nota correctamente");
 	}
 

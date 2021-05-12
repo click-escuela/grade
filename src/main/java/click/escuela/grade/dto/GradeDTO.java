@@ -15,9 +15,6 @@ public class GradeDTO {
 	@JsonProperty(value = "name")
 	private String name;
 
-	@JsonProperty(value = "course")
-	private String course;
-
 	@JsonProperty(value = "subject")
 	private String subject;
 

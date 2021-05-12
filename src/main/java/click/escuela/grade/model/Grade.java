@@ -33,8 +33,8 @@ public class Grade {
 	@Column(name = "name", nullable = false)
 	private String name;
 
-	@Column(name = "course", nullable = false)
-	private String course;
+	@Column(name = "course_id", nullable = false)
+	private UUID courseId;
 	
 	@Column(name = "subject", nullable = false)
 	private String subject;

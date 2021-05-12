@@ -23,6 +23,11 @@ import lombok.experimental.SuperBuilder;
 @Schema(description = "Grade Api")
 @SuperBuilder
 public class GradeApi {
+	
+	@NotBlank(message = "Student cannot be empty")
+	@Size(max = 50, message = "Student must be less than 50 characters")
+	@JsonProperty(value = "studentId", required = true)
+	private String studentId;
 
 	@NotBlank(message = "Name cannot be empty")
 	@Size(max = 50, message = "Name must be less than 50 characters")
@@ -31,8 +36,8 @@ public class GradeApi {
 
 	@NotBlank(message = "Course cannot be empty")
 	@Size(max = 50, message = "Course must be less than 50 characters")
-	@JsonProperty(value = "course", required = true)
-	private String course;
+	@JsonProperty(value = "courseId", required = true)
+	private String courseId;
 
 	@NotBlank(message = "Subject cannot be empty")
 	@Size(max = 50, message = "Subject must be less than 50 characters")
