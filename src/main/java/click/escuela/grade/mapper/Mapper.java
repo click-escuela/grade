@@ -15,6 +15,10 @@ import click.escuela.grade.model.Grade;
 @Component
 public class Mapper {
 
+	private Mapper() {
+
+	}
+
 	private static ModelMapper modelMapper = new ModelMapper();
 
 	public static Grade mapperToGrade(GradeApi gradeApi) {
