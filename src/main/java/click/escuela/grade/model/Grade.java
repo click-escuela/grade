@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import click.escuela.grade.enumerator.TypeEnum;
+import click.escuela.grade.enumerator.GradeType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,7 +44,7 @@ public class Grade {
 	
 	@Column(name = "type", nullable = false)
 	@Enumerated(EnumType.STRING)
-	private TypeEnum type;
+	private GradeType type;
 	
 	@Column(name = "number", nullable = false)
 	private Integer number;

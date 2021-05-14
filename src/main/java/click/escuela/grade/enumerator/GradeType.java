@@ -1,5 +1,5 @@
 package click.escuela.grade.enumerator;
 
-public enum TypeEnum {
+public enum GradeType {
 	EXAM,PRACTICAL_WORK,HOMEWORK
 }
