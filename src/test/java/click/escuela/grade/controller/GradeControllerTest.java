@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import click.escuela.grade.api.GradeApi;
-import click.escuela.grade.enumerator.GradeEnum;
+import click.escuela.grade.enumerator.GradeMessage;
 import click.escuela.grade.enumerator.GradeType;
 import click.escuela.grade.exception.TransactionException;
 import click.escuela.grade.rest.GradeController;
@@ -78,7 +78,7 @@ public class GradeControllerTest {
 						.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi)))
 				.andExpect(status().is2xxSuccessful()).andReturn();
 		String response = result.getResponse().getContentAsString();
-		assertThat(response).contains(GradeEnum.CREATE_OK.name());
+		assertThat(response).contains(GradeMessage.CREATE_OK.name());
 
 	}
 

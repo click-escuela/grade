@@ -1,13 +1,15 @@
 package click.escuela.grade.service.impl;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import click.escuela.grade.api.GradeApi;
 import click.escuela.grade.dto.GradeDTO;
-import click.escuela.grade.enumerator.GradeEnum;
+import click.escuela.grade.enumerator.GradeMessage;
 import click.escuela.grade.exception.TransactionException;
 import click.escuela.grade.mapper.Mapper;
 import click.escuela.grade.model.Grade;
@@ -26,7 +28,7 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 			Grade grade = Mapper.mapperToGrade(gradeApi);
 			gradeRepository.save(grade);
 		} catch (Exception e) {
-			throw new TransactionException(GradeEnum.CREATE_ERROR.getCode(), GradeEnum.CREATE_ERROR.getDescription());
+			throw new TransactionException(GradeMessage.CREATE_ERROR.getCode(), GradeMessage.CREATE_ERROR.getDescription());
 		}
 	}
 
@@ -34,6 +36,28 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 	public List<GradeDTO> findAll() {
 		List<Grade> listGrades = gradeRepository.findAll();
 		return Mapper.mapperToGradesDTO(listGrades);
+	}
+
+	@Override
+	public void update(GradeApi gradeApi) throws TransactionException {
+
+		findById(gradeApi.getId()).ifPresent(grade -> {
+
+			grade.setName(gradeApi.getName());
+			grade.setNumber(gradeApi.getNumber());
+			grade.setSubject(gradeApi.getSubject());
+			grade.setType(Mapper.mapperToEnum(gradeApi.getType()));
+			grade.setCourseId(UUID.fromString(gradeApi.getCourseId()));
+			grade.setStudentId(UUID.fromString(gradeApi.getStudentId()));
+
+			gradeRepository.save(grade);
+		});
+
+	}
+
+	public Optional<Grade> findById(String id) throws TransactionException {
+		return Optional.of(gradeRepository.findById(UUID.fromString(id)).orElseThrow(
+				() -> new TransactionException(GradeMessage.GET_ERROR.getCode(), GradeMessage.GET_ERROR.getDescription())));
 	}
 
 }
