@@ -46,6 +46,7 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 			grade.setName(gradeApi.getName());
 			grade.setNumber(gradeApi.getNumber());
 			grade.setSubject(gradeApi.getSubject());
+			grade.setSchoolId(gradeApi.getSchoolId());
 			grade.setType(Mapper.mapperToEnum(gradeApi.getType()));
 			grade.setCourseId(UUID.fromString(gradeApi.getCourseId()));
 			grade.setStudentId(UUID.fromString(gradeApi.getStudentId()));
