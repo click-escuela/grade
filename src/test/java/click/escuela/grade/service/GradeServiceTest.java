@@ -48,8 +48,8 @@ public class GradeServiceTest {
 		studentId = UUID.randomUUID();
 		courseId = UUID.randomUUID();
 		schoolId = 1234;
-		grade = Grade.builder().id(id).name("Examen").subject("Matematica").type(GradeType.HOMEWORK)
-				.schoolId(schoolId).courseId(courseId).number(10).studentId(studentId).build();
+		grade = Grade.builder().id(id).name("Examen").subject("Matematica").type(GradeType.HOMEWORK).schoolId(schoolId)
+				.courseId(courseId).number(10).studentId(studentId).build();
 		gradeApi = GradeApi.builder().name("Examen").subject("Matematica").studentId(studentId.toString())
 				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).schoolId(schoolId).number(10)
 				.build();
@@ -78,7 +78,7 @@ public class GradeServiceTest {
 		GradeApi gradeApi = GradeApi.builder().name("Parcial").subject("Literatura").type(GradeType.EXAM.toString())
 				.number(5).build();
 		Mockito.when(gradeRepository.save(null)).thenThrow(IllegalArgumentException.class);
-		
+
 		assertThatExceptionOfType(TransactionException.class).isThrownBy(() -> {
 			gradeServiceImpl.create(gradeApi);
 		}).withMessage(GradeMessage.CREATE_ERROR.getDescription());
@@ -99,11 +99,96 @@ public class GradeServiceTest {
 	@Test
 	public void whenUpdateIsError() {
 		id = UUID.randomUUID();
-		
+
 		assertThatExceptionOfType(TransactionException.class).isThrownBy(() -> {
 			gradeApi.setId(id.toString());
 			gradeServiceImpl.update(gradeApi);
 		}).withMessage(GradeMessage.GET_ERROR.getDescription());
+	}
+
+	@Test
+	public void whenGetByIdIsOK() throws TransactionException {
+		boolean hasError = false;
+		try {
+			gradeServiceImpl.getById(id.toString());
+		} catch (Exception e) {
+			hasError = true;
+		}
+		assertThat(hasError).isFalse();
+	}
+
+	@Test
+	public void whenGetByIdIsError() throws TransactionException {
+		id = UUID.randomUUID();
+		assertThatExceptionOfType(TransactionException.class).isThrownBy(() -> {
+			gradeServiceImpl.getById(id.toString());
+		}).withMessage(GradeMessage.GET_ERROR.getDescription());
+	}
+
+	@Test
+	public void whenGetBySchoolIsOK() throws TransactionException {
+		boolean hasError = false;
+		try {
+			gradeServiceImpl.getBySchoolId(schoolId.toString());
+		} catch (Exception e) {
+			hasError = true;
+		}
+		assertThat(hasError).isFalse();
+	}
+
+	@Test
+	public void whenGetBySchoolIsError() {
+		boolean hasError = false;
+		try {
+			gradeServiceImpl.getBySchoolId(null);
+		} catch (Exception e) {
+			hasError = true;
+		}
+		assertThat(hasError).isTrue();
+	}
+
+	@Test
+	public void whenGetByIdCourseIsOK() {
+		boolean hasError = false;
+		try {
+			gradeServiceImpl.getByCourseId(courseId.toString());
+		} catch (Exception e) {
+			hasError = true;
+		}
+		assertThat(hasError).isFalse();
+	}
+
+	@Test
+	public void whenGetByIdCourseIsError() {
+		boolean hasError = false;
+		try {
+			gradeServiceImpl.getByCourseId(null);
+		} catch (Exception e) {
+			hasError = true;
+		}
+		assertThat(hasError).isTrue();
+	}
+
+	@Test
+	public void whenGetByIdStudentIsOK() {
+		boolean hasError = false;
+		try {
+			gradeServiceImpl.getByStudentId(studentId.toString());
+		} catch (Exception e) {
+			hasError = true;
+		}
+		assertThat(hasError).isFalse();
+	}
+
+	@Test
+	public void whenGetByIdStudentIsError() {
+		boolean hasError = false;
+		try {
+			gradeServiceImpl.getByStudentId(null);
+		} catch (Exception e) {
+			hasError = true;
+		}
+		assertThat(hasError).isTrue();
 	}
 
 }
