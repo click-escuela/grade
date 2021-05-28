@@ -28,7 +28,8 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 			Grade grade = Mapper.mapperToGrade(gradeApi);
 			gradeRepository.save(grade);
 		} catch (Exception e) {
-			throw new TransactionException(GradeMessage.CREATE_ERROR.getCode(), GradeMessage.CREATE_ERROR.getDescription());
+			throw new TransactionException(GradeMessage.CREATE_ERROR.getCode(),
+					GradeMessage.CREATE_ERROR.getDescription());
 		}
 	}
 
@@ -57,8 +58,27 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 	}
 
 	public Optional<Grade> findById(String id) throws TransactionException {
-		return Optional.of(gradeRepository.findById(UUID.fromString(id)).orElseThrow(
-				() -> new TransactionException(GradeMessage.GET_ERROR.getCode(), GradeMessage.GET_ERROR.getDescription())));
+		return Optional.of(gradeRepository.findById(UUID.fromString(id))
+				.orElseThrow(() -> new TransactionException(GradeMessage.GET_ERROR.getCode(),
+						GradeMessage.GET_ERROR.getDescription())));
+	}
+
+	public GradeDTO getById(String id) throws TransactionException {
+		Grade grade = findById(id).orElseThrow(() -> new TransactionException(GradeMessage.GET_ERROR.getCode(),
+				GradeMessage.GET_ERROR.getDescription()));
+		return Mapper.mapperToGradeDTO(grade);
+	}
+
+	public List<GradeDTO> getBySchoolId(String schoolId) {
+		return Mapper.mapperToGradesDTO(gradeRepository.findBySchoolId(Integer.valueOf(schoolId)));
+	}
+
+	public List<GradeDTO> getByStudentId(String studentId) {
+		return Mapper.mapperToGradesDTO(gradeRepository.findByStudentId(UUID.fromString(studentId)));
+	}
+
+	public List<GradeDTO> getByCourseId(String gradeId) {
+		return Mapper.mapperToGradesDTO(gradeRepository.findByCourseId(UUID.fromString(gradeId)));
 	}
 
 }
