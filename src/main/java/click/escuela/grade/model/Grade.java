@@ -36,19 +36,23 @@ public class Grade {
 	@Column(name = "name", nullable = false)
 	private String name;
 
-	@Column(name = "course_id", nullable = false)
+	@Column(name = "school_id", nullable = false)
+	private Integer schoolId;
+
+	@Column(name = "course_id", columnDefinition = "BINARY(16)", nullable = false)
 	private UUID courseId;
-	
+
 	@Column(name = "subject", nullable = false)
 	private String subject;
-	
+
 	@Column(name = "type", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private GradeType type;
-	
+
 	@Column(name = "number", nullable = false)
 	private Integer number;
 
-	@Column(name = "student_id", nullable = false)
+	@Column(name = "student_id", columnDefinition = "BINARY(16)", nullable = false)
+
 	private UUID studentId;
 }
