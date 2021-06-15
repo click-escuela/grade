@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.List;
+
 import java.util.UUID;
 
 import org.junit.Before;
@@ -19,16 +20,19 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
+
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -40,6 +44,7 @@ import click.escuela.grade.enumerator.GradeType;
 import click.escuela.grade.exception.TransactionException;
 import click.escuela.grade.mapper.Mapper;
 import click.escuela.grade.model.Grade;
+
 import click.escuela.grade.rest.GradeController;
 import click.escuela.grade.rest.handler.Handler;
 import click.escuela.grade.service.impl.GradeServiceImpl;
@@ -60,6 +65,7 @@ public class GradeControllerTest {
 	private GradeApi gradeApi;
 	private static String EMPTY = "";
 	private String id;
+
 	private String schoolId;
 	private String studentId;
 	private String courseId;
@@ -90,6 +96,7 @@ public class GradeControllerTest {
 		Mockito.when(gradeService.getBySchoolId(schoolId)).thenReturn(Mapper.mapperToGradesDTO(grades));
 		Mockito.when(gradeService.getByCourseId(courseId)).thenReturn(Mapper.mapperToGradesDTO(grades));
 		Mockito.when(gradeService.getByStudentId(studentId)).thenReturn(Mapper.mapperToGradesDTO(grades));
+
 	}
 
 	@Test
@@ -99,6 +106,7 @@ public class GradeControllerTest {
 				.andExpect(status().is2xxSuccessful()).andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains(GradeMessage.CREATE_OK.name());
+
 	}
 
 	@Test
@@ -109,6 +117,7 @@ public class GradeControllerTest {
 				.andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains("Name cannot be empty");
+
 	}
 
 	@Test
@@ -119,6 +128,7 @@ public class GradeControllerTest {
 				.andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains("Subject cannot be empty");
+
 	}
 
 	@Test

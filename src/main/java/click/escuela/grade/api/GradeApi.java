@@ -26,7 +26,7 @@ public class GradeApi {
 	
 	@JsonProperty(value = "id", required = false)
 	private String id;
-	
+
 	@NotBlank(message = "Student cannot be empty")
 	@Size(max = 50, message = "Student must be less than 50 characters")
 	@JsonProperty(value = "studentId", required = true)
@@ -40,6 +40,7 @@ public class GradeApi {
 	@NotNull(message = "School cannot be null")
 	@JsonProperty(value = "schoolId", required = true)
 	private Integer schoolId;
+
 
 	@NotBlank(message = "Course cannot be empty")
 	@Size(max = 50, message = "Course must be less than 50 characters")

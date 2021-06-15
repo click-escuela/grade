@@ -9,7 +9,7 @@ import click.escuela.grade.model.Grade;
 
 public interface GradeRepository extends JpaRepository<Grade, UUID> {
 
-	public List<Grade> findBySchoolId(Integer schoolId);
+  public List<Grade> findBySchoolId(Integer schoolId);
 
 	public List<Grade> findByCourseId(UUID id);
 

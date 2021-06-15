@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.Optional;
+
 import java.util.UUID;
 
 import org.junit.Before;
@@ -18,6 +19,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import click.escuela.grade.api.GradeApi;
 import click.escuela.grade.enumerator.GradeMessage;
+
 import click.escuela.grade.enumerator.GradeType;
 import click.escuela.grade.exception.TransactionException;
 import click.escuela.grade.mapper.Mapper;
@@ -39,6 +41,7 @@ public class GradeServiceTest {
 	private UUID studentId;
 	private UUID courseId;
 	private Integer schoolId;
+
 
 	@Before
 	public void setUp() {

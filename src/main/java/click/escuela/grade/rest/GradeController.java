@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,8 +40,7 @@ public class GradeController {
 	@GetMapping(value = "/getAll", produces = { MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<List<GradeDTO>> getStudents() {
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(gradeService.findAll());
-	}
-	
+	}	
 	@Operation(summary = "Get grade by Id", responses = {
 			@ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GradeDTO.class))) })
 	@GetMapping(value = "{gradeId}", produces = { MediaType.APPLICATION_JSON_VALUE })
