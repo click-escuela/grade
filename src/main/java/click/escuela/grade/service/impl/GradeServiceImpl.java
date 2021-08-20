@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import click.escuela.grade.api.GradeApi;
+import click.escuela.grade.dto.CourseDTO;
 import click.escuela.grade.dto.GradeDTO;
 import click.escuela.grade.enumerator.GradeMessage;
 
@@ -80,6 +81,11 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 
 	public List<GradeDTO> getByCourseId(String gradeId) {
 		return Mapper.mapperToGradesDTO(gradeRepository.findByCourseId(UUID.fromString(gradeId)));
+	}
+
+	public List<CourseDTO> getCoursesWithGrades(List<CourseDTO> courses) {
+		courses.stream().forEach(course -> course.setGrades(Mapper.mapperToGradesDTO(gradeRepository.findByCourseId(UUID.fromString(course.getId())))));
+		return courses;
 	}
 
 }
