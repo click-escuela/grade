@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import click.escuela.grade.api.GradeApi;
+import click.escuela.grade.dto.CourseDTO;
+import click.escuela.grade.dto.CourseStudentsShortDTO;
 import click.escuela.grade.dto.GradeDTO;
 import click.escuela.grade.enumerator.GradeMessage;
 import click.escuela.grade.exception.TransactionException;
@@ -88,5 +90,13 @@ public class GradeController {
 		gradeService.update(gradeApi);
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(GradeMessage.UPDATE_OK);
 	}
-
+	
+	@Operation(summary = "Get courses with grades", responses = {
+			@ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CourseDTO.class))) })
+	@PutMapping(value = "courses", produces = { MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<List<CourseStudentsShortDTO>> getCoursesWithGrades(
+			@RequestBody @Validated List<CourseStudentsShortDTO> courses){
+		return ResponseEntity.status(HttpStatus.ACCEPTED).body(gradeService.getCoursesWithGrades(courses));
+	}
+	
 }
