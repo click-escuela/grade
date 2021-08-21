@@ -3,11 +3,16 @@ package click.escuela.grade.service.impl;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import click.escuela.grade.api.GradeApi;
+import click.escuela.grade.dto.CourseDTO;
+import click.escuela.grade.dto.CourseStudentsShortDTO;
 import click.escuela.grade.dto.GradeDTO;
+import click.escuela.grade.dto.StudentShortDTO;
 import click.escuela.grade.enumerator.GradeMessage;
 
 import click.escuela.grade.exception.TransactionException;
@@ -30,7 +35,6 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 		} catch (Exception e) {
 			throw new TransactionException(GradeMessage.CREATE_ERROR.getCode(),
 					GradeMessage.CREATE_ERROR.getDescription());
-
 		}
 	}
 
@@ -80,6 +84,23 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 
 	public List<GradeDTO> getByCourseId(String gradeId) {
 		return Mapper.mapperToGradesDTO(gradeRepository.findByCourseId(UUID.fromString(gradeId)));
+	}
+
+	public List<CourseStudentsShortDTO> getCoursesWithGrades(List<CourseStudentsShortDTO> courses) {
+		List<String> coursesIds = courses.stream().map(CourseDTO::getId).collect(Collectors.toList());
+		List<Grade> grades = getByCourses(coursesIds);
+		courses.forEach(course -> course.getStudents().forEach(student -> student.setGrades(Mapper.mapperToGradesDTO(getGradesByCourse(grades, student, UUID.fromString(course.getId()))))));
+		return courses;
+	}
+
+	public List<Grade> getByCourses(List<String> coursesIds) {
+		List<UUID> listUUID = coursesIds.stream().map(UUID::fromString).collect(Collectors.toList());
+		return gradeRepository.findByCourseIdIn(listUUID);
+	}
+
+	private List<Grade> getGradesByCourse(List<Grade> grades, StudentShortDTO student, UUID courseId ) {
+		return grades.stream().filter(grade -> grade.getStudentId().equals(UUID.fromString(student.getId())) && grade.getCourseId().equals(courseId))
+				.collect(Collectors.toList());
 	}
 
 }
