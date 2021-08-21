@@ -98,6 +98,4 @@ public class GradeController {
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(gradeService.getCoursesWithGrades(courses));
 	}
 	
-	
-
 }

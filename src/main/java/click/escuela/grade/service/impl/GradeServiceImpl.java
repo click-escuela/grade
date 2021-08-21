@@ -3,6 +3,8 @@ package click.escuela.grade.service.impl;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +33,6 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 		} catch (Exception e) {
 			throw new TransactionException(GradeMessage.CREATE_ERROR.getCode(),
 					GradeMessage.CREATE_ERROR.getDescription());
-
 		}
 	}
 
@@ -84,8 +85,20 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 	}
 
 	public List<CourseDTO> getCoursesWithGrades(List<CourseDTO> courses) {
-		courses.stream().forEach(course -> course.setGrades(Mapper.mapperToGradesDTO(gradeRepository.findByCourseId(UUID.fromString(course.getId())))));
+		List<String> coursesIds = courses.stream().map(CourseDTO::getId).collect(Collectors.toList());
+		List<Grade> grades = getByCourses(coursesIds);
+		courses.forEach(course -> course.setGrades(Mapper.mapperToGradesDTO(getGradesByCourse(grades, course))));
 		return courses;
+	}
+
+	public List<Grade> getByCourses(List<String> coursesIds) {
+		List<UUID> listUUID = coursesIds.stream().map(UUID::fromString).collect(Collectors.toList());
+		return gradeRepository.findByCourseIdIn(listUUID);
+	}
+
+	private List<Grade> getGradesByCourse(List<Grade> grades, CourseDTO course) {
+		return grades.stream().filter(grade -> grade.getCourseId().equals(UUID.fromString(course.getId())))
+				.collect(Collectors.toList());
 	}
 
 }

@@ -53,6 +53,5 @@ public class Grade {
 	private Integer number;
 
 	@Column(name = "student_id", columnDefinition = "BINARY(16)", nullable = false)
-
 	private UUID studentId;
 }
