@@ -89,7 +89,8 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 	public List<CourseStudentsShortDTO> getCoursesWithGrades(List<CourseStudentsShortDTO> courses) {
 		List<String> coursesIds = courses.stream().map(CourseDTO::getId).collect(Collectors.toList());
 		List<Grade> grades = getByCourses(coursesIds);
-		courses.forEach(course -> course.getStudents().forEach(student -> student.setGrades(Mapper.mapperToGradesDTO(getGradesByCourse(grades, student, UUID.fromString(course.getId()))))));
+		courses.forEach(course -> course.getStudents().forEach(student -> student.setGrades(
+				Mapper.mapperToGradesDTO(getGradesByCourse(grades, student, UUID.fromString(course.getId()))))));
 		return courses;
 	}
 
@@ -98,9 +99,9 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 		return gradeRepository.findByCourseIdIn(listUUID);
 	}
 
-	private List<Grade> getGradesByCourse(List<Grade> grades, StudentShortDTO student, UUID courseId ) {
-		return grades.stream().filter(grade -> grade.getStudentId().equals(UUID.fromString(student.getId())) && grade.getCourseId().equals(courseId))
-				.collect(Collectors.toList());
+	private List<Grade> getGradesByCourse(List<Grade> grades, StudentShortDTO student, UUID courseId) {
+		return grades.stream().filter(grade -> grade.getStudentId().equals(UUID.fromString(student.getId()))
+				&& grade.getCourseId().equals(courseId)).collect(Collectors.toList());
 	}
 
 }
