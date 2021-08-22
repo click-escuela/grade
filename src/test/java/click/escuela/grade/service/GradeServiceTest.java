@@ -22,6 +22,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import click.escuela.grade.api.GradeApi;
 import click.escuela.grade.dto.CourseStudentsShortDTO;
+import click.escuela.grade.dto.GradeDTO;
 import click.escuela.grade.dto.StudentShortDTO;
 import click.escuela.grade.enumerator.GradeMessage;
 
@@ -47,7 +48,7 @@ public class GradeServiceTest {
 	private UUID courseId;
 	private Integer schoolId;
 	private List<CourseStudentsShortDTO> courses = new ArrayList<>();
-
+	private List<UUID> listUUID = new ArrayList<>();
 
 	@Before
 	public void setUp() {
@@ -79,7 +80,6 @@ public class GradeServiceTest {
 		students.add(student);
 		course.setStudents(students);
 		courses.add(course);
-		List<UUID> listUUID = new ArrayList<>();
 		listUUID.add(courseId);
 		Mockito.when(Mapper.mapperToGrade(gradeApi)).thenReturn(grade);
 		Mockito.when(gradeRepository.findById(id)).thenReturn(optional);
@@ -146,7 +146,7 @@ public class GradeServiceTest {
 	}
 
 	@Test
-	public void whenGetByIdIsError() throws TransactionException {
+	public void whenGetByIdIsError(){
 		id = UUID.randomUUID();
 		assertThatExceptionOfType(TransactionException.class).isThrownBy(() -> {
 			gradeServiceImpl.getById(id.toString());
@@ -228,6 +228,20 @@ public class GradeServiceTest {
 			hasError = true;
 		}
 		assertThat(hasError).isFalse();
+	}
+	
+	@Test
+	public void whenGetCourseWithGradesIsEmpty() {
+		courses.get(0).setId(UUID.randomUUID().toString());
+		List<GradeDTO> grades = gradeServiceImpl.getCoursesWithGrades(courses).get(0).getStudents().get(0).getGrades();
+		assertThat(grades).isEmpty();
+	}
+	
+	@Test
+	public void whenGetCourseWithGradesIsEmptyTwo() {
+		courses.get(0).getStudents().get(0).setId(UUID.randomUUID().toString());
+		List<GradeDTO> grades = gradeServiceImpl.getCoursesWithGrades(courses).get(0).getStudents().get(0).getGrades();
+		assertThat(grades).isEmpty();
 	}
 
 	@Test
