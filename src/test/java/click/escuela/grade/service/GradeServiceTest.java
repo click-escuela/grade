@@ -79,11 +79,13 @@ public class GradeServiceTest {
 		students.add(student);
 		course.setStudents(students);
 		courses.add(course);
-		
+		List<UUID> listUUID = new ArrayList<>();
+		listUUID.add(courseId);
 		Mockito.when(Mapper.mapperToGrade(gradeApi)).thenReturn(grade);
 		Mockito.when(gradeRepository.findById(id)).thenReturn(optional);
 		Mockito.when(gradeRepository.save(grade)).thenReturn(grade);
 		Mockito.when(gradeRepository.findAll()).thenReturn(grades);
+		Mockito.when(gradeRepository.findByCourseIdIn(listUUID)).thenReturn(grades);
 
 		ReflectionTestUtils.setField(gradeServiceImpl, "gradeRepository", gradeRepository);
 	}
