@@ -3,6 +3,8 @@ package click.escuela.grade.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import java.util.UUID;
@@ -18,6 +20,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import click.escuela.grade.api.GradeApi;
+import click.escuela.grade.dto.CourseStudentsShortDTO;
+import click.escuela.grade.dto.StudentShortDTO;
 import click.escuela.grade.enumerator.GradeMessage;
 
 import click.escuela.grade.enumerator.GradeType;
@@ -41,6 +45,7 @@ public class GradeServiceTest {
 	private UUID studentId;
 	private UUID courseId;
 	private Integer schoolId;
+	private List<CourseStudentsShortDTO> courses = new ArrayList<>();
 
 
 	@Before
@@ -57,7 +62,20 @@ public class GradeServiceTest {
 				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).schoolId(schoolId).number(10)
 				.build();
 		Optional<Grade> optional = Optional.of(grade);
-
+		CourseStudentsShortDTO course = new CourseStudentsShortDTO();
+		course.setCountStudent(20);
+		course.setDivision("B");
+		course.setId(courseId.toString());
+		course.setYear(10);
+		StudentShortDTO student = new StudentShortDTO();
+		student.setId(studentId.toString());
+		student.setName("Anotnio");
+		student.setSurname("Liendro");
+		List<StudentShortDTO> students = new ArrayList<>();
+		students.add(student);
+		course.setStudents(students);
+		courses.add(course);
+		
 		Mockito.when(Mapper.mapperToGrade(gradeApi)).thenReturn(grade);
 		Mockito.when(gradeRepository.findById(id)).thenReturn(optional);
 		Mockito.when(gradeRepository.save(grade)).thenReturn(grade);
@@ -192,6 +210,17 @@ public class GradeServiceTest {
 			hasError = true;
 		}
 		assertThat(hasError).isTrue();
+	}
+	
+	@Test
+	public void whenGetCourseWithGradesIsOk() {
+		boolean hasError = false;
+		try {
+			gradeServiceImpl.getCoursesWithGrades(courses);
+		} catch (Exception e) {
+			hasError = true;
+		}
+		assertThat(hasError).isFalse();
 	}
 
 }

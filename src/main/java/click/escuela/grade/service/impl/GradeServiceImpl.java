@@ -93,7 +93,7 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 		return courses;
 	}
 
-	public List<Grade> getByCourses(List<String> coursesIds) {
+	private List<Grade> getByCourses(List<String> coursesIds) {
 		List<UUID> listUUID = coursesIds.stream().map(UUID::fromString).collect(Collectors.toList());
 		return gradeRepository.findByCourseIdIn(listUUID);
 	}
