@@ -2,6 +2,7 @@ package click.escuela.grade.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,10 +68,13 @@ public class GradeServiceTest {
 		course.setDivision("B");
 		course.setId(courseId.toString());
 		course.setYear(10);
+		List<Grade> grades = new ArrayList<>();
+		grades.add(grade);
 		StudentShortDTO student = new StudentShortDTO();
 		student.setId(studentId.toString());
 		student.setName("Anotnio");
 		student.setSurname("Liendro");
+		student.setGrades(Mapper.mapperToGradesDTO(grades));
 		List<StudentShortDTO> students = new ArrayList<>();
 		students.add(student);
 		course.setStudents(students);
@@ -79,6 +83,7 @@ public class GradeServiceTest {
 		Mockito.when(Mapper.mapperToGrade(gradeApi)).thenReturn(grade);
 		Mockito.when(gradeRepository.findById(id)).thenReturn(optional);
 		Mockito.when(gradeRepository.save(grade)).thenReturn(grade);
+		Mockito.when(gradeRepository.findAll()).thenReturn(grades);
 
 		ReflectionTestUtils.setField(gradeServiceImpl, "gradeRepository", gradeRepository);
 	}
@@ -223,4 +228,9 @@ public class GradeServiceTest {
 		assertThat(hasError).isFalse();
 	}
 
+	@Test
+	public void whenGetAllIsOK() {
+		gradeServiceImpl.findAll();
+		verify(gradeRepository).findAll();
+	}
 }
