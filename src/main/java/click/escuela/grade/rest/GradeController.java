@@ -40,7 +40,7 @@ public class GradeController {
 	@Operation(summary = "Get all the grades", responses = {
 			@ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GradeDTO.class))) })
 	@GetMapping(value = "/getAll", produces = { MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<List<GradeDTO>> getStudents() {
+	public ResponseEntity<List<GradeDTO>> getGrades() {
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(gradeService.findAll());
 	}	
 	@Operation(summary = "Get grade by Id", responses = {
