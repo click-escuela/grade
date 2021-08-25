@@ -38,7 +38,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import click.escuela.grade.api.GradeApi;
+import click.escuela.grade.dto.CourseStudentsShortDTO;
 import click.escuela.grade.dto.GradeDTO;
+import click.escuela.grade.dto.StudentShortDTO;
 import click.escuela.grade.enumerator.GradeMessage;
 import click.escuela.grade.enumerator.GradeType;
 import click.escuela.grade.exception.TransactionException;
@@ -69,6 +71,7 @@ public class GradeControllerTest {
 	private String schoolId;
 	private String studentId;
 	private String courseId;
+	private List<CourseStudentsShortDTO> courses = new ArrayList<>();
 
 	@Before
 	public void setup() throws TransactionException {
@@ -90,13 +93,28 @@ public class GradeControllerTest {
 				.schoolId(Integer.valueOf(schoolId)).number(10).build();
 		List<Grade> grades = new ArrayList<>();
 		grades.add(grade);
+		
+		CourseStudentsShortDTO course = new CourseStudentsShortDTO();
+		course.setCountStudent(20);
+		course.setDivision("B");
+		course.setId(courseId);
+		course.setYear(10);
+		StudentShortDTO student = new StudentShortDTO();
+		student.setId(studentId);
+		student.setName("Anotnio");
+		student.setSurname("Liendro");
+		student.setGrades(Mapper.mapperToGradesDTO(grades));
+		List<StudentShortDTO> students = new ArrayList<>();
+		students.add(student);
+		course.setStudents(students);
+		courses.add(course);
 
 		doNothing().when(gradeService).create(Mockito.any());
 		Mockito.when(gradeService.getById(id)).thenReturn(Mapper.mapperToGradeDTO(grade));
 		Mockito.when(gradeService.getBySchoolId(schoolId)).thenReturn(Mapper.mapperToGradesDTO(grades));
 		Mockito.when(gradeService.getByCourseId(courseId)).thenReturn(Mapper.mapperToGradesDTO(grades));
 		Mockito.when(gradeService.getByStudentId(studentId)).thenReturn(Mapper.mapperToGradesDTO(grades));
-
+		Mockito.when(gradeService.getCoursesWithGrades(Mockito.any())).thenReturn(courses);
 	}
 
 	@Test
@@ -305,6 +323,27 @@ public class GradeControllerTest {
 				.andExpect(status().is(HttpStatus.ACCEPTED.value())).andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains("");
+	}
+
+	@Test
+	public void getCoursesWithGradesIsOk() throws JsonProcessingException, Exception {
+		MvcResult result = mockMvc
+				.perform(MockMvcRequestBuilders.put("/school/{schoolId}/grade/courses", schoolId)
+						.contentType(MediaType.APPLICATION_JSON).content(toJson(courses)))
+				.andExpect(status().is2xxSuccessful()).andReturn();
+		TypeReference<List<CourseStudentsShortDTO>> typeReference = new TypeReference<List<CourseStudentsShortDTO>>() {};
+		List<CourseStudentsShortDTO> results = mapper.readValue(result.getResponse().getContentAsString(),
+				typeReference);
+		assertThat(results.get(0).getId()).isEqualTo(courseId);
+	}
+
+	@Test
+	public void getGrades() throws JsonProcessingException, Exception {
+		MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/school/{schoolId}/grade", schoolId)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().is(HttpStatus.ACCEPTED.value())).andReturn();
+		TypeReference<List<GradeDTO>> typeReference = new TypeReference<List<GradeDTO>>() {};
+		List<GradeDTO> results = mapper.readValue(result.getResponse().getContentAsString(), typeReference);
+		assertThat(results.get(0).getId()).isEqualTo(id);
 	}
 
 	private String toJson(final Object obj) throws JsonProcessingException {
