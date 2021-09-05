@@ -20,6 +20,7 @@ import click.escuela.grade.api.GradeApi;
 import click.escuela.grade.dto.CourseDTO;
 import click.escuela.grade.dto.CourseStudentsShortDTO;
 import click.escuela.grade.dto.GradeDTO;
+import click.escuela.grade.dto.StudentShortDTO;
 import click.escuela.grade.enumerator.GradeMessage;
 import click.escuela.grade.exception.TransactionException;
 import click.escuela.grade.service.impl.GradeServiceImpl;
@@ -97,6 +98,14 @@ public class GradeController {
 	public ResponseEntity<List<CourseStudentsShortDTO>> getCoursesWithGrades(
 			@RequestBody @Validated List<CourseStudentsShortDTO> courses){
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(gradeService.getCoursesWithGrades(courses));
+	}
+	
+	@Operation(summary = "Get students with grades", responses = {
+			@ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentShortDTO.class))) })
+	@PutMapping(value = "students", produces = { MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<List<StudentShortDTO>> getStudentsWithGrades(
+			@RequestBody @Validated List<StudentShortDTO> students){
+		return ResponseEntity.status(HttpStatus.ACCEPTED).body(gradeService.getStudentsWithGrades(students));
 	}
 	
 }
