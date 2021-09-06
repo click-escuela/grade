@@ -115,6 +115,8 @@ public class GradeControllerTest {
 		Mockito.when(gradeService.getByCourseId(courseId)).thenReturn(Mapper.mapperToGradesDTO(grades));
 		Mockito.when(gradeService.getByStudentId(studentId)).thenReturn(Mapper.mapperToGradesDTO(grades));
 		Mockito.when(gradeService.getCoursesWithGrades(Mockito.any())).thenReturn(courses);
+		Mockito.when(gradeService.getStudentsWithGrades(Mockito.any())).thenReturn(students);
+
 	}
 
 	@Test
@@ -335,6 +337,18 @@ public class GradeControllerTest {
 		List<CourseStudentsShortDTO> results = mapper.readValue(result.getResponse().getContentAsString(),
 				typeReference);
 		assertThat(results.get(0).getId()).isEqualTo(courseId);
+	}
+	
+	@Test
+	public void getStudentsWithGradesIsOk() throws JsonProcessingException, Exception {
+		MvcResult result = mockMvc
+				.perform(MockMvcRequestBuilders.put("/school/{schoolId}/grade/students", schoolId)
+						.contentType(MediaType.APPLICATION_JSON).content(toJson(courses)))
+				.andExpect(status().is2xxSuccessful()).andReturn();
+		TypeReference<List<StudentShortDTO>> typeReference = new TypeReference<List<StudentShortDTO>>() {};
+		List<StudentShortDTO> results = mapper.readValue(result.getResponse().getContentAsString(),
+				typeReference);
+		assertThat(results.get(0).getId()).isEqualTo(studentId);
 	}
 
 	@Test
