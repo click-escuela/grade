@@ -49,6 +49,8 @@ public class GradeServiceTest {
 	private Integer schoolId;
 	private List<CourseStudentsShortDTO> courses = new ArrayList<>();
 	private List<UUID> listUUID = new ArrayList<>();
+	private List<StudentShortDTO> students = new ArrayList<>();
+	private List<UUID> listUUIDStudents = new ArrayList<>();
 
 	@Before
 	public void setUp() {
@@ -76,17 +78,18 @@ public class GradeServiceTest {
 		student.setName("Anotnio");
 		student.setSurname("Liendro");
 		student.setGrades(Mapper.mapperToGradesDTO(grades));
-		List<StudentShortDTO> students = new ArrayList<>();
+
 		students.add(student);
 		course.setStudents(students);
 		courses.add(course);
 		listUUID.add(courseId);
+		listUUIDStudents.add(studentId);
 		Mockito.when(Mapper.mapperToGrade(gradeApi)).thenReturn(grade);
 		Mockito.when(gradeRepository.findById(id)).thenReturn(optional);
 		Mockito.when(gradeRepository.save(grade)).thenReturn(grade);
 		Mockito.when(gradeRepository.findAll()).thenReturn(grades);
 		Mockito.when(gradeRepository.findByCourseIdIn(listUUID)).thenReturn(grades);
-
+		Mockito.when(gradeRepository.findByStudentIdIn(listUUIDStudents)).thenReturn(grades);
 		ReflectionTestUtils.setField(gradeServiceImpl, "gradeRepository", gradeRepository);
 	}
 
@@ -249,4 +252,23 @@ public class GradeServiceTest {
 		gradeServiceImpl.findAll();
 		verify(gradeRepository).findAll();
 	}
+	
+	@Test
+	public void whenGetStudentsWithGradesIsOk() {
+		boolean hasError = false;
+		try {
+			gradeServiceImpl.getStudentsWithGrades(students);
+		} catch (Exception e) {
+			hasError = true;
+		}
+		assertThat(hasError).isFalse();
+	}
+	
+	@Test
+	public void whenGetStudentsWithGradesIsEmpty() {
+		students.get(0).setId(UUID.randomUUID().toString());
+		List<GradeDTO> grades = gradeServiceImpl.getStudentsWithGrades(students).get(0).getGrades();
+		assertThat(grades).isEmpty();
+	}
+	
 }
