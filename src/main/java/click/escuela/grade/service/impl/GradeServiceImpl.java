@@ -95,7 +95,11 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 	}
 	
 	private List<Grade> getGradesByStudent(List<Grade> grades, StudentShortDTO student) {
-		return grades.stream().filter(grade -> grade.getStudentId().equals(UUID.fromString(student.getId()))).collect(Collectors.toList());
+		return grades.stream().filter(grade -> doesGradeBelongToStudent(grade,student)).collect(Collectors.toList());
+	}
+	
+	private boolean doesGradeBelongToStudent(Grade grade, StudentShortDTO student) {
+		return grade.getStudentId().equals(UUID.fromString(student.getId()));
 	}
 
 	public List<GradeDTO> getByCourseId(String gradeId) {
