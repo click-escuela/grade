@@ -81,6 +81,26 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 	public List<GradeDTO> getByStudentId(String studentId) {
 		return Mapper.mapperToGradesDTO(gradeRepository.findByStudentId(UUID.fromString(studentId)));
 	}
+	
+	public List<StudentShortDTO> getStudentsWithGrades(List<StudentShortDTO> students) {
+		List<String> studentIds = students.stream().map(StudentShortDTO::getId).collect(Collectors.toList());
+		List<Grade> grades = getByStudents(studentIds);
+		students.forEach(student -> student.setGrades(Mapper.mapperToGradesDTO(getGradesByStudent(grades, student))));
+		return students;
+	}
+	
+	private List<Grade> getByStudents(List<String> studentsIds) {
+		List<UUID> listUUID = studentsIds.stream().map(UUID::fromString).collect(Collectors.toList());
+		return gradeRepository.findByStudentIdIn(listUUID);
+	}
+	
+	private List<Grade> getGradesByStudent(List<Grade> grades, StudentShortDTO student) {
+		return grades.stream().filter(grade -> doesGradeBelongToStudent(grade,student)).collect(Collectors.toList());
+	}
+	
+	private boolean doesGradeBelongToStudent(Grade grade, StudentShortDTO student) {
+		return grade.getStudentId().equals(UUID.fromString(student.getId()));
+	}
 
 	public List<GradeDTO> getByCourseId(String gradeId) {
 		return Mapper.mapperToGradesDTO(gradeRepository.findByCourseId(UUID.fromString(gradeId)));
