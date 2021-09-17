@@ -21,6 +21,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import click.escuela.grade.api.GradeApi;
+import click.escuela.grade.api.GradeCreateApi;
 import click.escuela.grade.dto.CourseStudentsShortDTO;
 import click.escuela.grade.dto.GradeDTO;
 import click.escuela.grade.dto.StudentShortDTO;
@@ -42,6 +43,7 @@ public class GradeServiceTest {
 
 	private GradeServiceImpl gradeServiceImpl = new GradeServiceImpl();
 	private GradeApi gradeApi;
+	private GradeCreateApi gradeCreateApi;
 	private Grade grade;
 	private UUID id;
 	private UUID studentId;
@@ -65,6 +67,13 @@ public class GradeServiceTest {
 		gradeApi = GradeApi.builder().name("Examen").subject("Matematica").studentId(studentId.toString())
 				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).schoolId(schoolId).number(10)
 				.build();
+		List<String> studentsIds = new ArrayList<>();
+		studentsIds.add(studentId.toString());
+		List<Integer> notes = new ArrayList<>();
+		notes.add(10);
+		gradeCreateApi = GradeCreateApi.builder().name("Examen").subject("Matematica").studentId(studentsIds)
+				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).schoolId(schoolId).number(notes)
+				.build();
 		Optional<Grade> optional = Optional.of(grade);
 		CourseStudentsShortDTO course = new CourseStudentsShortDTO();
 		course.setCountStudent(20);
@@ -85,6 +94,7 @@ public class GradeServiceTest {
 		listUUID.add(courseId);
 		listUUIDStudents.add(studentId);
 		Mockito.when(Mapper.mapperToGrade(gradeApi)).thenReturn(grade);
+		Mockito.when(Mapper.mapperToGrade(gradeCreateApi)).thenReturn(grade);
 		Mockito.when(gradeRepository.findById(id)).thenReturn(optional);
 		Mockito.when(gradeRepository.save(grade)).thenReturn(grade);
 		Mockito.when(gradeRepository.findAll()).thenReturn(grades);
@@ -97,7 +107,7 @@ public class GradeServiceTest {
 	public void whenCreateIsOk() {
 		boolean hasError = false;
 		try {
-			gradeServiceImpl.create(gradeApi);
+			gradeServiceImpl.create(gradeCreateApi);
 		} catch (Exception e) {
 			hasError = true;
 		}
@@ -106,12 +116,9 @@ public class GradeServiceTest {
 
 	@Test
 	public void whenCreateIsError() {
-		GradeApi gradeApi = GradeApi.builder().name("Parcial").subject("Literatura").type(GradeType.EXAM.toString())
-				.number(5).build();
 		Mockito.when(gradeRepository.save(null)).thenThrow(IllegalArgumentException.class);
-
 		assertThatExceptionOfType(TransactionException.class).isThrownBy(() -> {
-			gradeServiceImpl.create(gradeApi);
+			gradeServiceImpl.create(new GradeCreateApi());
 		}).withMessage(GradeMessage.CREATE_ERROR.getDescription());
 	}
 
