@@ -22,15 +22,12 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @NoArgsConstructor
 @JsonInclude(Include.NON_EMPTY)
-@Schema(description = "Grade Api")
+@Schema(description = "Grade Create Api")
 @SuperBuilder
 public class GradeCreateApi {
 	
 	@JsonProperty(value = "id", required = false)
 	private String id;
-
-	@JsonProperty(value = "studentId", required = true)
-	private List<String> studentId;
 
 	@NotBlank(message = "Name cannot be empty")
 	@Size(max = 50, message = "Name must be less than 50 characters")
@@ -40,12 +37,13 @@ public class GradeCreateApi {
 	@NotNull(message = "School cannot be null")
 	@JsonProperty(value = "schoolId", required = true)
 	private Integer schoolId;
+	
+	@JsonProperty(value = "studentId", required = true)
+	private List<String> studentId;
 
-	@NotBlank(message = "Course cannot be empty")
-	@Size(max = 50, message = "Course must be less than 50 characters")
-	@JsonProperty(value = "courseId", required = true)
-	private String courseId;
-
+	@JsonProperty(value = "number", required = true)
+	private List<Integer> number;
+	
 	@NotBlank(message = "Subject cannot be empty")
 	@Size(max = 50, message = "Subject must be less than 50 characters")
 	@JsonProperty(value = "subject", required = true)
@@ -56,7 +54,9 @@ public class GradeCreateApi {
 	@JsonProperty(value = "type", required = true)
 	private String type;
 
-	@JsonProperty(value = "number", required = true)
-	private List<Integer> number;
+	@NotBlank(message = "Course cannot be empty")
+	@Size(max = 50, message = "Course must be less than 50 characters")
+	@JsonProperty(value = "courseId", required = true)
+	private String courseId;
 
 }
