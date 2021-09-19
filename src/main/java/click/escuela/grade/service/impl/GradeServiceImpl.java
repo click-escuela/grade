@@ -31,10 +31,10 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 
 	public void create(GradeCreateApi gradeApi) throws TransactionException {
 		try {
-			List<String> students = gradeApi.getStudentId();
-			List<Integer> notes = gradeApi.getNumber();
-			gradeApi.setNumber(null);
-			gradeApi.setStudentId(null);
+			List<String> students = gradeApi.getStudentIds();
+			List<Integer> notes = gradeApi.getNumbers();
+			gradeApi.setNumbers(null);
+			gradeApi.setStudentIds(null);
 			if(students.size() == notes.size()) {
 				IntStream.range(0, students.size())
 		         .forEach(i -> {

@@ -38,11 +38,11 @@ public class GradeCreateApi {
 	@JsonProperty(value = "schoolId", required = true)
 	private Integer schoolId;
 	
-	@JsonProperty(value = "studentId", required = true)
-	private List<String> studentId;
+	@JsonProperty(value = "studentIds", required = true)
+	private List<String> studentIds;
 
-	@JsonProperty(value = "number", required = true)
-	private List<Integer> number;
+	@JsonProperty(value = "numbers", required = true)
+	private List<Integer> numbers;
 	
 	@NotBlank(message = "Subject cannot be empty")
 	@Size(max = 50, message = "Subject must be less than 50 characters")
