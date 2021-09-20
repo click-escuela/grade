@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import click.escuela.grade.api.GradeApi;
+import click.escuela.grade.api.GradeCreateApi;
 import click.escuela.grade.dto.CourseDTO;
 import click.escuela.grade.dto.CourseStudentsShortDTO;
 import click.escuela.grade.dto.GradeDTO;
@@ -27,11 +29,22 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 	@Autowired
 	private GradeRepository gradeRepository;
 
-	@Override
-	public void create(GradeApi gradeApi) throws TransactionException {
+	public void create(GradeCreateApi gradeApi) throws TransactionException {
 		try {
-			Grade grade = Mapper.mapperToGrade(gradeApi);
-			gradeRepository.save(grade);
+			List<String> students = gradeApi.getStudentIds();
+			List<Integer> notes = gradeApi.getNumbers();
+			gradeApi.setNumbers(null);
+			gradeApi.setStudentIds(null);
+			if(students.size() == notes.size()) {
+				IntStream.range(0, students.size())
+		         .forEach(i -> {
+		        	 Grade grade = new Grade();				
+						grade = Mapper.mapperToGrade(gradeApi);
+						grade.setStudentId(UUID.fromString(students.get(i)));
+						grade.setNumber(notes.get(i));
+						gradeRepository.save(grade);
+		         });
+			}
 		} catch (Exception e) {
 			throw new TransactionException(GradeMessage.CREATE_ERROR.getCode(),
 					GradeMessage.CREATE_ERROR.getDescription());

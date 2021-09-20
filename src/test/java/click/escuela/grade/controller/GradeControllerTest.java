@@ -38,6 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import click.escuela.grade.api.GradeApi;
+import click.escuela.grade.api.GradeCreateApi;
 import click.escuela.grade.dto.CourseStudentsShortDTO;
 import click.escuela.grade.dto.GradeDTO;
 import click.escuela.grade.dto.StudentShortDTO;
@@ -65,6 +66,7 @@ public class GradeControllerTest {
 
 	private ObjectMapper mapper;
 	private GradeApi gradeApi;
+	private GradeCreateApi gradeCreateApi;
 	private static String EMPTY = "";
 	private String id;
 
@@ -87,6 +89,13 @@ public class GradeControllerTest {
 		courseId = UUID.randomUUID().toString();
 		gradeApi = GradeApi.builder().name("Examen").subject("Matematica").studentId(studentId)
 				.type(GradeType.HOMEWORK.toString()).courseId(courseId).schoolId(Integer.valueOf(schoolId)).number(10)
+				.build();
+		List<String> studentsIds = new ArrayList<>();
+		studentsIds.add(studentId.toString());
+		List<Integer> notes = new ArrayList<>();
+		notes.add(10);
+		gradeCreateApi = GradeCreateApi.builder().name("Examen").subject("Matematica").studentIds(studentsIds)
+				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).schoolId(1234).numbers(notes)
 				.build();
 		Grade grade = Grade.builder().id(UUID.fromString(id)).name("Examen").subject("Matematica")
 				.studentId(UUID.fromString(studentId)).type(GradeType.HOMEWORK).courseId(UUID.fromString(courseId))
@@ -122,7 +131,7 @@ public class GradeControllerTest {
 	@Test
 	public void whenCreateIsOk() throws JsonProcessingException, Exception {
 		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi)))
+				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeCreateApi)))
 				.andExpect(status().is2xxSuccessful()).andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains(GradeMessage.CREATE_OK.name());
@@ -131,9 +140,9 @@ public class GradeControllerTest {
 
 	@Test
 	public void whenCreateButNameEmpty() throws JsonProcessingException, Exception {
-		gradeApi.setName(EMPTY);
+		gradeCreateApi.setName(EMPTY);
 		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi))).andExpect(status().isBadRequest())
+				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeCreateApi))).andExpect(status().isBadRequest())
 				.andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains("Name cannot be empty");
@@ -142,9 +151,9 @@ public class GradeControllerTest {
 
 	@Test
 	public void whenCreateButSubjectEmpty() throws JsonProcessingException, Exception {
-		gradeApi.setSubject(EMPTY);
+		gradeCreateApi.setSubject(EMPTY);
 		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi))).andExpect(status().isBadRequest())
+				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeCreateApi))).andExpect(status().isBadRequest())
 				.andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains("Subject cannot be empty");
@@ -153,50 +162,32 @@ public class GradeControllerTest {
 
 	@Test
 	public void whenCreateButCourseEmpty() throws JsonProcessingException, Exception {
-		gradeApi.setCourseId(EMPTY);
+		gradeCreateApi.setCourseId(EMPTY);
 		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi))).andExpect(status().isBadRequest())
+				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeCreateApi))).andExpect(status().isBadRequest())
 				.andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains("Course cannot be empty");
 	}
 
-	@Test
-	public void whenCreateButStudentEmpty() throws JsonProcessingException, Exception {
-		gradeApi.setStudentId(EMPTY);
-		;
-		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi))).andExpect(status().isBadRequest())
-				.andReturn();
-		String response = result.getResponse().getContentAsString();
-		assertThat(response).contains("Student cannot be empty");
-	}
+	
 
 	@Test
 	public void whenCreateButTypeEmpty() throws JsonProcessingException, Exception {
-		gradeApi.setType(EMPTY);
+		gradeCreateApi.setType(EMPTY);
 		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi))).andExpect(status().isBadRequest())
+				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeCreateApi))).andExpect(status().isBadRequest())
 				.andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains("Type cannot be empty");
 	}
 
-	@Test
-	public void whenCreateButNumberNull() throws JsonProcessingException, Exception {
-		gradeApi.setNumber(null);
-		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi))).andExpect(status().isBadRequest())
-				.andReturn();
-		String response = result.getResponse().getContentAsString();
-		assertThat(response).contains("Number cannot be null");
-	}
 
 	@Test
 	public void whenCreateButSchoolNull() throws JsonProcessingException, Exception {
-		gradeApi.setSchoolId(null);
+		gradeCreateApi.setSchoolId(null);
 		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi))).andExpect(status().isBadRequest())
+				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeCreateApi))).andExpect(status().isBadRequest())
 				.andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains("School cannot be null");
