@@ -17,9 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import click.escuela.grade.api.GradeApi;
+import click.escuela.grade.api.GradeCreateApi;
+
 import click.escuela.grade.dto.CourseDTO;
 import click.escuela.grade.dto.CourseStudentsShortDTO;
 import click.escuela.grade.dto.GradeDTO;
+import click.escuela.grade.dto.StudentShortDTO;
 import click.escuela.grade.enumerator.GradeMessage;
 import click.escuela.grade.exception.TransactionException;
 import click.escuela.grade.service.impl.GradeServiceImpl;
@@ -40,7 +43,7 @@ public class GradeController {
 	@Operation(summary = "Get all the grades", responses = {
 			@ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GradeDTO.class))) })
 	@GetMapping(value = "/getAll", produces = { MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<List<GradeDTO>> getStudents() {
+	public ResponseEntity<List<GradeDTO>> getGrades() {
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(gradeService.findAll());
 	}	
 	@Operation(summary = "Get grade by Id", responses = {
@@ -78,7 +81,7 @@ public class GradeController {
 	@Operation(summary = "Create grade", responses = {
 			@ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json")) })
 	@PostMapping(value = "", produces = { MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<GradeMessage> create(@RequestBody @Validated GradeApi gradeApi) throws TransactionException {
+	public ResponseEntity<GradeMessage> create(@RequestBody @Validated GradeCreateApi gradeApi) throws TransactionException {
 		gradeService.create(gradeApi);
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(GradeMessage.CREATE_OK);
 	}
@@ -97,6 +100,14 @@ public class GradeController {
 	public ResponseEntity<List<CourseStudentsShortDTO>> getCoursesWithGrades(
 			@RequestBody @Validated List<CourseStudentsShortDTO> courses){
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(gradeService.getCoursesWithGrades(courses));
+	}
+	
+	@Operation(summary = "Get students with grades", responses = {
+			@ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentShortDTO.class))) })
+	@PutMapping(value = "students", produces = { MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<List<StudentShortDTO>> getStudentsWithGrades(
+			@RequestBody @Validated List<StudentShortDTO> students){
+		return ResponseEntity.status(HttpStatus.ACCEPTED).body(gradeService.getStudentsWithGrades(students));
 	}
 	
 }

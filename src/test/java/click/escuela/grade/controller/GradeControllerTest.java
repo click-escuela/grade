@@ -38,7 +38,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import click.escuela.grade.api.GradeApi;
+import click.escuela.grade.api.GradeCreateApi;
+import click.escuela.grade.dto.CourseStudentsShortDTO;
 import click.escuela.grade.dto.GradeDTO;
+import click.escuela.grade.dto.StudentShortDTO;
 import click.escuela.grade.enumerator.GradeMessage;
 import click.escuela.grade.enumerator.GradeType;
 import click.escuela.grade.exception.TransactionException;
@@ -63,12 +66,14 @@ public class GradeControllerTest {
 
 	private ObjectMapper mapper;
 	private GradeApi gradeApi;
+	private GradeCreateApi gradeCreateApi;
 	private static String EMPTY = "";
 	private String id;
 
 	private String schoolId;
 	private String studentId;
 	private String courseId;
+	private List<CourseStudentsShortDTO> courses = new ArrayList<>();
 
 	@Before
 	public void setup() throws TransactionException {
@@ -85,24 +90,48 @@ public class GradeControllerTest {
 		gradeApi = GradeApi.builder().name("Examen").subject("Matematica").studentId(studentId)
 				.type(GradeType.HOMEWORK.toString()).courseId(courseId).schoolId(Integer.valueOf(schoolId)).number(10)
 				.build();
+		List<String> studentsIds = new ArrayList<>();
+		studentsIds.add(studentId.toString());
+		List<Integer> notes = new ArrayList<>();
+		notes.add(10);
+		gradeCreateApi = GradeCreateApi.builder().name("Examen").subject("Matematica").studentIds(studentsIds)
+				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).schoolId(1234).numbers(notes)
+				.build();
 		Grade grade = Grade.builder().id(UUID.fromString(id)).name("Examen").subject("Matematica")
 				.studentId(UUID.fromString(studentId)).type(GradeType.HOMEWORK).courseId(UUID.fromString(courseId))
 				.schoolId(Integer.valueOf(schoolId)).number(10).build();
 		List<Grade> grades = new ArrayList<>();
 		grades.add(grade);
+		
+		CourseStudentsShortDTO course = new CourseStudentsShortDTO();
+		course.setCountStudent(20);
+		course.setDivision("B");
+		course.setId(courseId);
+		course.setYear(10);
+		StudentShortDTO student = new StudentShortDTO();
+		student.setId(studentId);
+		student.setName("Anotnio");
+		student.setSurname("Liendro");
+		student.setGrades(Mapper.mapperToGradesDTO(grades));
+		List<StudentShortDTO> students = new ArrayList<>();
+		students.add(student);
+		course.setStudents(students);
+		courses.add(course);
 
 		doNothing().when(gradeService).create(Mockito.any());
 		Mockito.when(gradeService.getById(id)).thenReturn(Mapper.mapperToGradeDTO(grade));
 		Mockito.when(gradeService.getBySchoolId(schoolId)).thenReturn(Mapper.mapperToGradesDTO(grades));
 		Mockito.when(gradeService.getByCourseId(courseId)).thenReturn(Mapper.mapperToGradesDTO(grades));
 		Mockito.when(gradeService.getByStudentId(studentId)).thenReturn(Mapper.mapperToGradesDTO(grades));
+		Mockito.when(gradeService.getCoursesWithGrades(Mockito.any())).thenReturn(courses);
+		Mockito.when(gradeService.getStudentsWithGrades(Mockito.any())).thenReturn(students);
 
 	}
 
 	@Test
 	public void whenCreateIsOk() throws JsonProcessingException, Exception {
 		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi)))
+				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeCreateApi)))
 				.andExpect(status().is2xxSuccessful()).andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains(GradeMessage.CREATE_OK.name());
@@ -111,9 +140,9 @@ public class GradeControllerTest {
 
 	@Test
 	public void whenCreateButNameEmpty() throws JsonProcessingException, Exception {
-		gradeApi.setName(EMPTY);
+		gradeCreateApi.setName(EMPTY);
 		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi))).andExpect(status().isBadRequest())
+				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeCreateApi))).andExpect(status().isBadRequest())
 				.andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains("Name cannot be empty");
@@ -122,9 +151,9 @@ public class GradeControllerTest {
 
 	@Test
 	public void whenCreateButSubjectEmpty() throws JsonProcessingException, Exception {
-		gradeApi.setSubject(EMPTY);
+		gradeCreateApi.setSubject(EMPTY);
 		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi))).andExpect(status().isBadRequest())
+				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeCreateApi))).andExpect(status().isBadRequest())
 				.andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains("Subject cannot be empty");
@@ -133,50 +162,32 @@ public class GradeControllerTest {
 
 	@Test
 	public void whenCreateButCourseEmpty() throws JsonProcessingException, Exception {
-		gradeApi.setCourseId(EMPTY);
+		gradeCreateApi.setCourseId(EMPTY);
 		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi))).andExpect(status().isBadRequest())
+				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeCreateApi))).andExpect(status().isBadRequest())
 				.andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains("Course cannot be empty");
 	}
 
-	@Test
-	public void whenCreateButStudentEmpty() throws JsonProcessingException, Exception {
-		gradeApi.setStudentId(EMPTY);
-		;
-		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi))).andExpect(status().isBadRequest())
-				.andReturn();
-		String response = result.getResponse().getContentAsString();
-		assertThat(response).contains("Student cannot be empty");
-	}
+	
 
 	@Test
 	public void whenCreateButTypeEmpty() throws JsonProcessingException, Exception {
-		gradeApi.setType(EMPTY);
+		gradeCreateApi.setType(EMPTY);
 		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi))).andExpect(status().isBadRequest())
+				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeCreateApi))).andExpect(status().isBadRequest())
 				.andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains("Type cannot be empty");
 	}
 
-	@Test
-	public void whenCreateButNumberNull() throws JsonProcessingException, Exception {
-		gradeApi.setNumber(null);
-		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi))).andExpect(status().isBadRequest())
-				.andReturn();
-		String response = result.getResponse().getContentAsString();
-		assertThat(response).contains("Number cannot be null");
-	}
 
 	@Test
 	public void whenCreateButSchoolNull() throws JsonProcessingException, Exception {
-		gradeApi.setSchoolId(null);
+		gradeCreateApi.setSchoolId(null);
 		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeApi))).andExpect(status().isBadRequest())
+				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeCreateApi))).andExpect(status().isBadRequest())
 				.andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains("School cannot be null");
@@ -305,6 +316,39 @@ public class GradeControllerTest {
 				.andExpect(status().is(HttpStatus.ACCEPTED.value())).andReturn();
 		String response = result.getResponse().getContentAsString();
 		assertThat(response).contains("");
+	}
+
+	@Test
+	public void getCoursesWithGradesIsOk() throws JsonProcessingException, Exception {
+		MvcResult result = mockMvc
+				.perform(MockMvcRequestBuilders.put("/school/{schoolId}/grade/courses", schoolId)
+						.contentType(MediaType.APPLICATION_JSON).content(toJson(courses)))
+				.andExpect(status().is2xxSuccessful()).andReturn();
+		TypeReference<List<CourseStudentsShortDTO>> typeReference = new TypeReference<List<CourseStudentsShortDTO>>() {};
+		List<CourseStudentsShortDTO> results = mapper.readValue(result.getResponse().getContentAsString(),
+				typeReference);
+		assertThat(results.get(0).getId()).isEqualTo(courseId);
+	}
+	
+	@Test
+	public void getStudentsWithGradesIsOk() throws JsonProcessingException, Exception {
+		MvcResult result = mockMvc
+				.perform(MockMvcRequestBuilders.put("/school/{schoolId}/grade/students", schoolId)
+						.contentType(MediaType.APPLICATION_JSON).content(toJson(courses)))
+				.andExpect(status().is2xxSuccessful()).andReturn();
+		TypeReference<List<StudentShortDTO>> typeReference = new TypeReference<List<StudentShortDTO>>() {};
+		List<StudentShortDTO> results = mapper.readValue(result.getResponse().getContentAsString(),
+				typeReference);
+		assertThat(results.get(0).getId()).isEqualTo(studentId);
+	}
+
+	@Test
+	public void getGrades() throws JsonProcessingException, Exception {
+		MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/school/{schoolId}/grade", schoolId)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().is(HttpStatus.ACCEPTED.value())).andReturn();
+		TypeReference<List<GradeDTO>> typeReference = new TypeReference<List<GradeDTO>>() {};
+		List<GradeDTO> results = mapper.readValue(result.getResponse().getContentAsString(), typeReference);
+		assertThat(results.get(0).getId()).isEqualTo(id);
 	}
 
 	private String toJson(final Object obj) throws JsonProcessingException {

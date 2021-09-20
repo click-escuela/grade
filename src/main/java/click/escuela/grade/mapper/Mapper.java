@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import click.escuela.grade.api.GradeApi;
+import click.escuela.grade.api.GradeCreateApi;
 import click.escuela.grade.dto.GradeDTO;
 import click.escuela.grade.enumerator.GradeType;
 import click.escuela.grade.model.Grade;
@@ -24,7 +25,13 @@ public class Mapper {
 	public static Grade mapperToGrade(GradeApi gradeApi) {
 		Grade grade = modelMapper.map(gradeApi, Grade.class);
 		grade.setCourseId(UUID.fromString(gradeApi.getCourseId()));
-		grade.setStudentId(UUID.fromString(gradeApi.getStudentId()));
+		grade.setType(mapperToEnum(gradeApi.getType()));
+		return grade;
+	}
+	
+	public static Grade mapperToGrade(GradeCreateApi gradeApi) {
+		Grade grade = modelMapper.map(gradeApi, Grade.class);
+		grade.setCourseId(UUID.fromString(gradeApi.getCourseId()));
 		grade.setType(mapperToEnum(gradeApi.getType()));
 		return grade;
 	}
