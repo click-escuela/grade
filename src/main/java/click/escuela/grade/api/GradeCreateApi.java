@@ -3,7 +3,6 @@ package click.escuela.grade.api;
 import java.util.List;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -33,10 +32,6 @@ public class GradeCreateApi {
 	@Size(max = 50, message = "Name must be less than 50 characters")
 	@JsonProperty(value = "name", required = true)
 	private String name;
-	
-	@NotNull(message = "School cannot be null")
-	@JsonProperty(value = "schoolId", required = true)
-	private Integer schoolId;
 	
 	@JsonProperty(value = "studentIds", required = true)
 	private List<String> studentIds;
