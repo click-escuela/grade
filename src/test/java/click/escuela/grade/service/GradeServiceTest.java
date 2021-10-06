@@ -28,11 +28,14 @@ import click.escuela.grade.dto.StudentShortDTO;
 import click.escuela.grade.enumerator.GradeMessage;
 
 import click.escuela.grade.enumerator.GradeType;
+import click.escuela.grade.exception.SchoolException;
 import click.escuela.grade.exception.TransactionException;
 import click.escuela.grade.mapper.Mapper;
 import click.escuela.grade.model.Grade;
+import click.escuela.grade.model.School;
 import click.escuela.grade.repository.GradeRepository;
 import click.escuela.grade.service.impl.GradeServiceImpl;
+import click.escuela.grade.service.impl.SchoolServiceImpl;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ Mapper.class })
@@ -40,6 +43,9 @@ public class GradeServiceTest {
 
 	@Mock
 	private GradeRepository gradeRepository;
+	
+	@Mock
+	private SchoolServiceImpl schoolService;
 
 	private GradeServiceImpl gradeServiceImpl = new GradeServiceImpl();
 	private GradeApi gradeApi;
@@ -48,31 +54,33 @@ public class GradeServiceTest {
 	private UUID id;
 	private UUID studentId;
 	private UUID courseId;
-	private Integer schoolId;
+	private UUID schoolId;
 	private List<CourseStudentsShortDTO> courses = new ArrayList<>();
 	private List<UUID> listUUID = new ArrayList<>();
 	private List<StudentShortDTO> students = new ArrayList<>();
 	private List<UUID> listUUIDStudents = new ArrayList<>();
 
 	@Before
-	public void setUp() {
+	public void setUp() throws SchoolException{
 		PowerMockito.mockStatic(Mapper.class);
 
 		id = UUID.randomUUID();
 		studentId = UUID.randomUUID();
 		courseId = UUID.randomUUID();
-		schoolId = 1234;
-		grade = Grade.builder().id(id).name("Examen").subject("Matematica").type(GradeType.HOMEWORK).schoolId(schoolId)
+		schoolId = UUID.randomUUID();
+		School school = new School();
+		school.setId(schoolId);
+		grade = Grade.builder().id(id).name("Examen").subject("Matematica").type(GradeType.HOMEWORK).school(school)
 				.courseId(courseId).number(10).studentId(studentId).build();
 		gradeApi = GradeApi.builder().name("Examen").subject("Matematica").studentId(studentId.toString())
-				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).schoolId(schoolId).number(10)
+				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).number(10)
 				.build();
 		List<String> studentsIds = new ArrayList<>();
 		studentsIds.add(studentId.toString());
 		List<Integer> notes = new ArrayList<>();
 		notes.add(10);
 		gradeCreateApi = GradeCreateApi.builder().name("Examen").subject("Matematica").studentIds(studentsIds)
-				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).schoolId(schoolId).numbers(notes)
+				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).numbers(notes)
 				.build();
 		Optional<Grade> optional = Optional.of(grade);
 		CourseStudentsShortDTO course = new CourseStudentsShortDTO();
@@ -96,18 +104,23 @@ public class GradeServiceTest {
 		Mockito.when(Mapper.mapperToGrade(gradeApi)).thenReturn(grade);
 		Mockito.when(Mapper.mapperToGrade(gradeCreateApi)).thenReturn(grade);
 		Mockito.when(gradeRepository.findById(id)).thenReturn(optional);
+		Mockito.when(gradeRepository.findByIdAndSchoolId(id, schoolId)).thenReturn(optional);
 		Mockito.when(gradeRepository.save(grade)).thenReturn(grade);
 		Mockito.when(gradeRepository.findAll()).thenReturn(grades);
 		Mockito.when(gradeRepository.findByCourseIdIn(listUUID)).thenReturn(grades);
 		Mockito.when(gradeRepository.findByStudentIdIn(listUUIDStudents)).thenReturn(grades);
+		Mockito.when(schoolService.getById(schoolId.toString())).thenReturn(school);
+
 		ReflectionTestUtils.setField(gradeServiceImpl, "gradeRepository", gradeRepository);
+		ReflectionTestUtils.setField(gradeServiceImpl, "schoolService", schoolService);
+
 	}
 
 	@Test
 	public void whenCreateIsOk() {
 		boolean hasError = false;
 		try {
-			gradeServiceImpl.create(gradeCreateApi);
+			gradeServiceImpl.create(schoolId.toString(), gradeCreateApi);
 		} catch (Exception e) {
 			hasError = true;
 		}
@@ -118,7 +131,7 @@ public class GradeServiceTest {
 	public void whenCreateIsError() {
 		Mockito.when(gradeRepository.save(null)).thenThrow(IllegalArgumentException.class);
 		assertThatExceptionOfType(TransactionException.class).isThrownBy(() -> {
-			gradeServiceImpl.create(new GradeCreateApi());
+			gradeServiceImpl.create(schoolId.toString(), new GradeCreateApi());
 		}).withMessage(GradeMessage.CREATE_ERROR.getDescription());
 	}
 
@@ -127,7 +140,7 @@ public class GradeServiceTest {
 		boolean hasError = false;
 		try {
 			gradeApi.setId(id.toString());
-			gradeServiceImpl.update(gradeApi);
+			gradeServiceImpl.update(schoolId.toString(), gradeApi);
 		} catch (Exception e) {
 			hasError = true;
 		}
@@ -140,7 +153,7 @@ public class GradeServiceTest {
 
 		assertThatExceptionOfType(TransactionException.class).isThrownBy(() -> {
 			gradeApi.setId(id.toString());
-			gradeServiceImpl.update(gradeApi);
+			gradeServiceImpl.update(schoolId.toString(), gradeApi);
 		}).withMessage(GradeMessage.GET_ERROR.getDescription());
 	}
 
@@ -148,7 +161,7 @@ public class GradeServiceTest {
 	public void whenGetByIdIsOK() throws TransactionException {
 		boolean hasError = false;
 		try {
-			gradeServiceImpl.getById(id.toString());
+			gradeServiceImpl.getById(schoolId.toString(), id.toString());
 		} catch (Exception e) {
 			hasError = true;
 		}
@@ -159,7 +172,7 @@ public class GradeServiceTest {
 	public void whenGetByIdIsError(){
 		id = UUID.randomUUID();
 		assertThatExceptionOfType(TransactionException.class).isThrownBy(() -> {
-			gradeServiceImpl.getById(id.toString());
+			gradeServiceImpl.getById(schoolId.toString(), id.toString());
 		}).withMessage(GradeMessage.GET_ERROR.getDescription());
 	}
 
