@@ -20,6 +20,7 @@ import click.escuela.grade.enumerator.GradeMessage;
 import click.escuela.grade.exception.TransactionException;
 import click.escuela.grade.mapper.Mapper;
 import click.escuela.grade.model.Grade;
+import click.escuela.grade.model.School;
 import click.escuela.grade.repository.GradeRepository;
 import click.escuela.grade.service.GradeServiceGeneric;
 
@@ -28,8 +29,12 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 
 	@Autowired
 	private GradeRepository gradeRepository;
+	
+	@Autowired
+	private SchoolServiceImpl schoolService;
 
-	public void create(GradeCreateApi gradeApi) throws TransactionException {
+	public void create(String schoolId, GradeCreateApi gradeApi) throws TransactionException {
+		School school = schoolService.getById(schoolId);
 		try {
 			List<String> students = gradeApi.getStudentIds();
 			List<Integer> notes = gradeApi.getNumbers();
@@ -42,6 +47,7 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 						grade = Mapper.mapperToGrade(gradeApi);
 						grade.setStudentId(UUID.fromString(students.get(i)));
 						grade.setNumber(notes.get(i));
+						grade.setSchool(school);
 						gradeRepository.save(grade);
 		         });
 			}
@@ -58,14 +64,13 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 	}
 
 	@Override
-	public void update(GradeApi gradeApi) throws TransactionException {
+	public void update(String schoolId, GradeApi gradeApi) throws TransactionException {
 
-		findById(gradeApi.getId()).ifPresent(grade -> {
+		findByIdAndSchoolId(schoolId, gradeApi.getId()).ifPresent(grade -> {
 
 			grade.setName(gradeApi.getName());
 			grade.setNumber(gradeApi.getNumber());
 			grade.setSubject(gradeApi.getSubject());
-			grade.setSchoolId(gradeApi.getSchoolId());
 			grade.setType(Mapper.mapperToEnum(gradeApi.getType()));
 			grade.setCourseId(UUID.fromString(gradeApi.getCourseId()));
 			grade.setStudentId(UUID.fromString(gradeApi.getStudentId()));
@@ -75,20 +80,20 @@ public class GradeServiceImpl implements GradeServiceGeneric<GradeApi, GradeDTO>
 
 	}
 
-	public Optional<Grade> findById(String id) throws TransactionException {
-		return Optional.of(gradeRepository.findById(UUID.fromString(id))
+	public Optional<Grade> findByIdAndSchoolId(String schoolId, String id) throws TransactionException {
+		return Optional.of(gradeRepository.findByIdAndSchoolId(UUID.fromString(id), UUID.fromString(schoolId))
 				.orElseThrow(() -> new TransactionException(GradeMessage.GET_ERROR.getCode(),
 						GradeMessage.GET_ERROR.getDescription())));
 	}
 
-	public GradeDTO getById(String id) throws TransactionException {
-		Grade grade = findById(id).orElseThrow(() -> new TransactionException(GradeMessage.GET_ERROR.getCode(),
+	public GradeDTO getById(String schoolId, String id) throws TransactionException {
+		Grade grade = findByIdAndSchoolId(schoolId, id).orElseThrow(() -> new TransactionException(GradeMessage.GET_ERROR.getCode(),
 				GradeMessage.GET_ERROR.getDescription()));
 		return Mapper.mapperToGradeDTO(grade);
 	}
 
 	public List<GradeDTO> getBySchoolId(String schoolId) {
-		return Mapper.mapperToGradesDTO(gradeRepository.findBySchoolId(Integer.valueOf(schoolId)));
+		return Mapper.mapperToGradesDTO(gradeRepository.findBySchoolId(UUID.fromString(schoolId)));
 	}
 
 	public List<GradeDTO> getByStudentId(String studentId) {
