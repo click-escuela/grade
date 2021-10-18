@@ -8,6 +8,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -36,8 +38,9 @@ public class Grade {
 	@Column(name = "name", nullable = false)
 	private String name;
 
-	@Column(name = "school_id", nullable = false)
-	private Integer schoolId;
+	@ManyToOne()
+    @JoinColumn(name = "id_school", referencedColumnName="id_school")
+    private School school;
 
 	@Column(name = "course_id", columnDefinition = "BINARY(16)", nullable = false)
 	private UUID courseId;
