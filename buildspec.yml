@@ -8,7 +8,6 @@ phases:
     commands:
       - mvn clean
       - mvn install
-     #- mvn --batch-mode --update-snapshots verify 
   post_build:
     commands:
       - echo Build completed
@@ -17,5 +16,4 @@ artifacts:
     - 'target/grade-0.0.1-SNAPSHOT.jar'
     - 'scripts/*.sh'
     - 'appspec.yml'
-  #com/mycompany/app/HelloWorld.java, specifying yes will place this file in /HelloWorld.java
   discard-paths: yes
