@@ -85,6 +85,7 @@ public class GradeController {
 	public ResponseEntity<GradeMessage> create(@Parameter(name = "School Id", required = true) @PathVariable("schoolId") String schoolId,
 			@RequestBody @Validated GradeCreateApi gradeApi) throws TransactionException {
 		gradeService.create(schoolId, gradeApi);
+
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(GradeMessage.CREATE_OK);
 	}
 	

@@ -55,6 +55,7 @@ public class GradeServiceTest {
 	private UUID studentId;
 	private UUID courseId;
 	private UUID schoolId;
+
 	private List<CourseStudentsShortDTO> courses = new ArrayList<>();
 	private List<UUID> listUUID = new ArrayList<>();
 	private List<StudentShortDTO> students = new ArrayList<>();
@@ -81,6 +82,13 @@ public class GradeServiceTest {
 		notes.add(10);
 		gradeCreateApi = GradeCreateApi.builder().name("Examen").subject("Matematica").studentIds(studentsIds)
 				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).numbers(notes)
+				.build();
+		List<String> studentsIds = new ArrayList<>();
+		studentsIds.add(studentId.toString());
+		List<Integer> notes = new ArrayList<>();
+		notes.add(10);
+		gradeCreateApi = GradeCreateApi.builder().name("Examen").subject("Matematica").studentIds(studentsIds)
+				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).schoolId(schoolId).numbers(notes)
 				.build();
 		Optional<Grade> optional = Optional.of(grade);
 		CourseStudentsShortDTO course = new CourseStudentsShortDTO();
@@ -121,6 +129,7 @@ public class GradeServiceTest {
 		boolean hasError = false;
 		try {
 			gradeServiceImpl.create(schoolId.toString(), gradeCreateApi);
+
 		} catch (Exception e) {
 			hasError = true;
 		}
@@ -132,6 +141,7 @@ public class GradeServiceTest {
 		Mockito.when(gradeRepository.save(null)).thenThrow(IllegalArgumentException.class);
 		assertThatExceptionOfType(TransactionException.class).isThrownBy(() -> {
 			gradeServiceImpl.create(schoolId.toString(), new GradeCreateApi());
+
 		}).withMessage(GradeMessage.CREATE_ERROR.getDescription());
 	}
 
