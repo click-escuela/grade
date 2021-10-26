@@ -97,12 +97,10 @@ public class GradeControllerTest {
 		gradeCreateApi = GradeCreateApi.builder().name("Examen").subject("Matematica").studentIds(studentsIds)
 				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).numbers(notes)
 				.build();
-		List<String> studentsIds = new ArrayList<>();
 		studentsIds.add(studentId.toString());
-		List<Integer> notes = new ArrayList<>();
 		notes.add(10);
 		gradeCreateApi = GradeCreateApi.builder().name("Examen").subject("Matematica").studentIds(studentsIds)
-				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).schoolId(1234).numbers(notes)
+				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).numbers(notes)
 				.build();
 		Grade grade = Grade.builder().id(UUID.fromString(id)).name("Examen").subject("Matematica")
 				.studentId(UUID.fromString(studentId)).type(GradeType.HOMEWORK).courseId(UUID.fromString(courseId))
