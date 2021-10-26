@@ -50,8 +50,9 @@ public class GradeController {
 			@ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GradeDTO.class))) })
 	@GetMapping(value = "{gradeId}", produces = { MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<GradeDTO> getById(
+			@Parameter(name = "School Id", required = true) @PathVariable("schoolId") String schoolId,
 			@Parameter(name = "Grade id", required = true) @PathVariable("gradeId") String gradeId) throws TransactionException{
-		return ResponseEntity.status(HttpStatus.ACCEPTED).body(gradeService.getById(gradeId));
+		return ResponseEntity.status(HttpStatus.ACCEPTED).body(gradeService.getById(schoolId, gradeId));
 	}
 
 	@Operation(summary = "Get grade by studentId", responses = {
@@ -81,16 +82,19 @@ public class GradeController {
 	@Operation(summary = "Create grade", responses = {
 			@ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json")) })
 	@PostMapping(value = "", produces = { MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<GradeMessage> create(@RequestBody @Validated GradeCreateApi gradeApi) throws TransactionException {
-		gradeService.create(gradeApi);
+	public ResponseEntity<GradeMessage> create(@Parameter(name = "School Id", required = true) @PathVariable("schoolId") String schoolId,
+			@RequestBody @Validated GradeCreateApi gradeApi) throws TransactionException {
+		gradeService.create(schoolId, gradeApi);
+
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(GradeMessage.CREATE_OK);
 	}
 	
 	@Operation(summary = "Update grade", responses = {
 			@ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json")) })
 	@PutMapping(value = "", produces = { MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<GradeMessage> update(@RequestBody @Validated GradeApi gradeApi) throws TransactionException {
-		gradeService.update(gradeApi);
+	public ResponseEntity<GradeMessage> update(@Parameter(name = "School Id", required = true) @PathVariable("schoolId") String schoolId,
+			@RequestBody @Validated GradeApi gradeApi) throws TransactionException {
+		gradeService.update(schoolId, gradeApi);
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(GradeMessage.UPDATE_OK);
 	}
 	

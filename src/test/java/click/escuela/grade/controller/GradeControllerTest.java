@@ -84,22 +84,27 @@ public class GradeControllerTest {
 		ReflectionTestUtils.setField(gradeController, "gradeService", gradeService);
 
 		id = UUID.randomUUID().toString();
-		schoolId = "1234";
+		schoolId =  UUID.randomUUID().toString();
 		studentId = UUID.randomUUID().toString();
 		courseId = UUID.randomUUID().toString();
 		gradeApi = GradeApi.builder().name("Examen").subject("Matematica").studentId(studentId)
-				.type(GradeType.HOMEWORK.toString()).courseId(courseId).schoolId(Integer.valueOf(schoolId)).number(10)
+				.type(GradeType.HOMEWORK.toString()).courseId(courseId).number(10)
 				.build();
 		List<String> studentsIds = new ArrayList<>();
 		studentsIds.add(studentId.toString());
 		List<Integer> notes = new ArrayList<>();
 		notes.add(10);
 		gradeCreateApi = GradeCreateApi.builder().name("Examen").subject("Matematica").studentIds(studentsIds)
-				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).schoolId(1234).numbers(notes)
+				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).numbers(notes)
+				.build();
+		studentsIds.add(studentId.toString());
+		notes.add(10);
+		gradeCreateApi = GradeCreateApi.builder().name("Examen").subject("Matematica").studentIds(studentsIds)
+				.type(GradeType.HOMEWORK.toString()).courseId(courseId.toString()).numbers(notes)
 				.build();
 		Grade grade = Grade.builder().id(UUID.fromString(id)).name("Examen").subject("Matematica")
 				.studentId(UUID.fromString(studentId)).type(GradeType.HOMEWORK).courseId(UUID.fromString(courseId))
-				.schoolId(Integer.valueOf(schoolId)).number(10).build();
+				.number(10).build();
 		List<Grade> grades = new ArrayList<>();
 		grades.add(grade);
 		
@@ -118,8 +123,8 @@ public class GradeControllerTest {
 		course.setStudents(students);
 		courses.add(course);
 
-		doNothing().when(gradeService).create(Mockito.any());
-		Mockito.when(gradeService.getById(id)).thenReturn(Mapper.mapperToGradeDTO(grade));
+		doNothing().when(gradeService).create(Mockito.anyString(), Mockito.any());
+		Mockito.when(gradeService.getById(schoolId, id)).thenReturn(Mapper.mapperToGradeDTO(grade));
 		Mockito.when(gradeService.getBySchoolId(schoolId)).thenReturn(Mapper.mapperToGradesDTO(grades));
 		Mockito.when(gradeService.getByCourseId(courseId)).thenReturn(Mapper.mapperToGradesDTO(grades));
 		Mockito.when(gradeService.getByStudentId(studentId)).thenReturn(Mapper.mapperToGradesDTO(grades));
@@ -182,17 +187,6 @@ public class GradeControllerTest {
 		assertThat(response).contains("Type cannot be empty");
 	}
 
-
-	@Test
-	public void whenCreateButSchoolNull() throws JsonProcessingException, Exception {
-		gradeCreateApi.setSchoolId(null);
-		MvcResult result = mockMvc.perform(post("/school/{schoolId}/grade", schoolId)
-				.contentType(MediaType.APPLICATION_JSON).content(toJson(gradeCreateApi))).andExpect(status().isBadRequest())
-				.andReturn();
-		String response = result.getResponse().getContentAsString();
-		assertThat(response).contains("School cannot be null");
-	}
-
 	@Test
 	public void whenUpdateOk() throws JsonProcessingException, Exception {
 
@@ -207,7 +201,7 @@ public class GradeControllerTest {
 	@Test
 	public void whenUpdateError() throws JsonProcessingException, Exception {
 		doThrow(new TransactionException(GradeMessage.UPDATE_ERROR.getCode(),
-				GradeMessage.UPDATE_ERROR.getDescription())).when(gradeService).update(Mockito.any());
+				GradeMessage.UPDATE_ERROR.getDescription())).when(gradeService).update(Mockito.anyString(), Mockito.any());
 
 		gradeApi.setId(id);
 		MvcResult result = mockMvc.perform(put("/school/{schoolId}/grade", schoolId)
@@ -231,7 +225,7 @@ public class GradeControllerTest {
 	public void getByIdIsError() throws JsonProcessingException, Exception {
 		id = UUID.randomUUID().toString();
 		doThrow(new TransactionException(GradeMessage.GET_ERROR.getCode(), GradeMessage.GET_ERROR.getDescription()))
-				.when(gradeService).getById(id);
+				.when(gradeService).getById(schoolId, id);
 
 		MvcResult result = mockMvc.perform(MockMvcRequestBuilders
 				.get("/school/{schoolId}/grade/{gradeId}", schoolId, id).contentType(MediaType.APPLICATION_JSON))
